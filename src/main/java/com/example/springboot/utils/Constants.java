@@ -3,7 +3,7 @@ package com.example.springboot.utils;
 
 /**
  * @version :
- * @Description: 状态
+ * @Description: 常量类
  * @author: 童志杰
  * @Date: 2019/3/28
  */

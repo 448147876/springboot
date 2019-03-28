@@ -7,6 +7,13 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+/**
+  * @Description: redis默认序列化是jdk的，但是会出现乱码，更改默认的序列化
+  * @author: 童志杰
+  * @Date: 2019/3/28
+  * @version :
+  */
+
 @Configuration
 public class RedisConfig {
     @Bean

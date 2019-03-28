@@ -7,6 +7,13 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+  * @Description: 全局异常处理类，避免错误到前端
+  * @author: 童志杰
+  * @Date: 2019/3/28
+  * @version : 
+  */
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
