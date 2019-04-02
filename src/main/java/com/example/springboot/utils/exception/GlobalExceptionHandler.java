@@ -3,9 +3,13 @@ package com.example.springboot.utils.exception;
 
 import com.example.springboot.utils.ResponseData;
 import com.example.springboot.utils.Constants;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.net.BindException;
 
 /**
   * @Description: 全局异常处理类，避免错误到前端
@@ -17,12 +21,29 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ResponseBody
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseData bindExceptionHandler(MethodArgumentNotValidException menthod) {
+        BindingResult bindingResult = menthod.getBindingResult();
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i=0;i<bindingResult.getFieldErrors().size();i++){
+            if(i>0){
+                stringBuilder.append(",");
+            }
+            stringBuilder.append(bindingResult.getFieldErrors().get(i).getField());
+            stringBuilder.append(";");
+        }
+        return ResponseData.ERROR(Constants.status.ERROR.getCode(),"");
+    }
+
 
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public ResponseData exceptionHandler(Exception ex) {
         return ResponseData.ERROR(Constants.status.ERROR.getCode(), ex.getMessage());
     }
+
+
 
     @ResponseBody
     @ExceptionHandler(value = MyRunTimeException.class)

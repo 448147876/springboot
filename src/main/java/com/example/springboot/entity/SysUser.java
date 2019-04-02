@@ -2,6 +2,8 @@ package com.example.springboot.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
@@ -26,6 +28,7 @@ public class SysUser implements Serializable {
     /**
      * 用户名称
      */
+    @NotBlank(message = "用户名称不能为空")
     private String userName;
 
     /**
