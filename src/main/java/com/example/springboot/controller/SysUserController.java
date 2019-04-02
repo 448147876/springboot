@@ -52,6 +52,9 @@ public class SysUserController {
     @RequestMapping("/save")
     public ResponseData save(@Validated SysUser sysUser) {
         boolean save = sysUserService.save(sysUser);
+        if(true){
+            throw new RuntimeException("自定义");
+        }
         return ResponseData.SUCCESS(save);
     }
     @RequestMapping("/saveValidation")

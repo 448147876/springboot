@@ -17,7 +17,7 @@ public class MpCode {
         String packageName = "com.example.springboot";
         boolean serviceNameStartWithI = true;//user -> UserService, 设置成true: user -> IUserService
         //需要的表名，多个表名传数组
-        generateByTables(serviceNameStartWithI, packageName, "abut_butt_register");
+        generateByTables(serviceNameStartWithI, packageName, "aop_log");
     }
 
 
