@@ -1,13 +1,11 @@
 package com.example.springboot.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
 /**
  * <p>
- * 
+ * 切面日志记录
  * </p>
  *
  * @author 童志杰
@@ -20,8 +18,7 @@ public class AopLog implements Serializable {
     /**
      * 主键
      */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private String id;
 
     /**
      * 请求/springboot/sysUser/save
@@ -41,7 +38,7 @@ public class AopLog implements Serializable {
     /**
      * 类型：,0，系统级别，。。。。。。
      */
-    private Integer type;
+    private String type;
 
     /**
      * 发生时间
@@ -89,11 +86,11 @@ public class AopLog implements Serializable {
     private Integer flag;
 
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -121,11 +118,11 @@ public class AopLog implements Serializable {
         this.url = url;
     }
 
-    public Integer getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(Integer type) {
+    public void setType(String type) {
         this.type = type;
     }
 

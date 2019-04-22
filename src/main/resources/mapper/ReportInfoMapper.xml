@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.ReportInfoMapper">
+
+    <select id="countLogin" resultType="java.lang.Integer">
+          select  count(1) from sys_log sl left join sys_user su on su.id = sl.create_by where sl.request_uri = '/official/a'
+          and sl.params = 'login=' and sl.exception is  not NULL and su.login_name = #{phoneNum}
+    </select>
+</mapper>

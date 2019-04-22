@@ -7,15 +7,15 @@ import org.springframework.stereotype.Controller;
 
 /**
  * <p>
- * 切面日志记录 前端控制器
+ * 对接平台信息表 前端控制器
  * </p>
  *
  * @author 童志杰
  * @since 2019-04-02
  */
 @Controller
-@RequestMapping("/aopLog")
-public class AopLogController {
+@RequestMapping("/abutButtInfo")
+public class AbutButtInfoController {
 
 }
 

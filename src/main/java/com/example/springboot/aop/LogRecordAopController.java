@@ -76,7 +76,7 @@ public class LogRecordAopController {
         aopLog.setRequestUrl(uri);
         aopLog.setRequestType(method);
         aopLog.setUrl(url);
-        aopLog.setType(0);
+        aopLog.setType("0");
         aopLog.setLogTime(LocalDateTime.now());
         aopLog.setClassName(clazzName);
         aopLog.setMethodName(methodName);

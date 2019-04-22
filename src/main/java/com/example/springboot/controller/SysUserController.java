@@ -1,8 +1,10 @@
 package com.example.springboot.controller;
 
 
+import com.example.springboot.entity.AopLog;
 import com.example.springboot.entity.SysUser;
 import com.example.springboot.service.impl.SysUserServiceImpl;
+import com.example.springboot.utils.JsonUtils;
 import com.example.springboot.utils.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.ValidationUtils;
@@ -28,6 +30,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/sysUser")
 public class SysUserController {
+
 
     @Autowired
     SysUserServiceImpl sysUserService;
@@ -65,6 +68,9 @@ public class SysUserController {
         sysUser.setCreateDate(LocalDateTime.now());
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         Set<ConstraintViolation<SysUser>> validate = validator.validate(sysUser);
+        for(ConstraintViolation<SysUser> constraintViolation:validate){
+            System.out.printf(constraintViolation.getMessage());;
+        }
 
 
         boolean save = sysUserService.save(sysUser);
