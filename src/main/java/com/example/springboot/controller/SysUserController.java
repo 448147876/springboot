@@ -4,7 +4,10 @@ package com.example.springboot.controller;
 import com.example.springboot.entity.SysUser;
 import com.example.springboot.service.impl.SysUserServiceImpl;
 import com.example.springboot.utils.ResponseData;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,9 +29,16 @@ public class SysUserController {
     @Autowired
     SysUserServiceImpl sysUserService;
 
-    @RequestMapping("/user")
+    @GetMapping
+    @ApiOperation(value="获得用户", notes="获得默认用户")
     public ResponseData getUser() {
         SysUser byId = sysUserService.getById(1);
+        return ResponseData.SUCCESS(byId);
+    }
+    @GetMapping(value = "user/{id}")
+    @ApiOperation(value="获得用户", notes="获得默认用户")
+    public ResponseData user(@PathVariable("id") String id) {
+        SysUser byId = sysUserService.getById(id);
         return ResponseData.SUCCESS(byId);
     }
 
