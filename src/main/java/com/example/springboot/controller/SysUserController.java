@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -41,6 +43,12 @@ public class SysUserController {
         sysUser.setCreateDate(LocalDateTime.now());
         boolean save = sysUserService.save(sysUser);
         return ResponseData.SUCCESS(save);
+    }
+
+    @RequestMapping("/table")
+    public ResponseData table() {
+        List<Map> list =  sysUserService.getTable("sys_user");
+        return ResponseData.SUCCESS(list);
     }
 
 }
