@@ -6,6 +6,11 @@ server:
 
 
 spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   redis:
     host: 127.0.0.1
     port: 6379
@@ -28,5 +33,14 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**.xml
   type-aliases-package: com.example.springboot.entity
 
+#pagehelper分页插件配置
+pagehelper:
+  helperDialect: mysql #设置sql语言
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
 swagger:
   enable=true:
+
+

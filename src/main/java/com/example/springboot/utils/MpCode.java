@@ -14,8 +14,8 @@ public class MpCode {
 
     @Test
     public void generateCode() {
-        String packageName = "com.example.springboot";
-        boolean serviceNameStartWithI = false;//user -> UserService, 设置成true: user -> IUserService
+        String packageName = "com.example.springboot.model";
+        boolean serviceNameStartWithI = true;//user -> UserService, 设置成true: user -> IUserService
         //需要的表名，多个表名传数组
         generateByTables(serviceNameStartWithI, packageName, "user_info");
     }
@@ -40,8 +40,11 @@ public class MpCode {
                 .setInclude(tableNames);
         config.setActiveRecord(false)
                 .setAuthor("tzj")
+                .setSwagger2(true)
+                .setBaseResultMap(true)//生成基本的resultMap
+                .setBaseColumnList(true)//生成基本的SQL片段
                 //代码生成目录
-                .setOutputDir(projectPath + "/src/main/java/demo")
+                .setOutputDir(projectPath + "/src/main/java")
                 .setFileOverride(true);
         if (!serviceNameStartWithI) {
             config.setServiceName("%sService");

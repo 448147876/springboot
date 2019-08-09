@@ -15,8 +15,8 @@ public class State<T> implements Serializable {
 
     private final static State state = new State();
 
-    private static int SUCCESS_CODE = Constants.status.SUCCESS.getCode();
-    private static int ERROR_CODE = Constants.status.ERROR.getCode();
+    private static int SUCCESS_CODE= Constants.httpState.SUCCESS.getCode();
+    private static int ERROR_CODE = Constants.httpState.ERROR.getCode();
 
     public int code;
     public String msg;

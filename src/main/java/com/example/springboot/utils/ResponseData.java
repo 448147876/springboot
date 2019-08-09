@@ -13,12 +13,25 @@ public class ResponseData<T> implements Serializable {
 
     private final static ResponseData responseData = new ResponseData();
 
-    private static int SUCCESS_CODE= Constants.status.SUCCESS.getCode();
-    private static int ERROR_CODE = Constants.status.ERROR.getCode();
+    private static int SUCCESS_CODE= Constants.httpState.SUCCESS.getCode();
+    private static int ERROR_CODE = Constants.httpState.ERROR.getCode();
 
     public int code;
     public String msg;
     public T data;
+
+
+    public static ResponseData RESPONSE(Constants.httpState menuState){
+        responseData.setCode(menuState.getCode());
+        responseData.setMsg(menuState.getMsg());
+        return responseData;
+    }
+    public static<T> ResponseData RESPONSE(Constants.httpState menuState,T t){
+        responseData.setCode(menuState.getCode());
+        responseData.setMsg(menuState.getMsg());
+        responseData.setData(t);
+        return responseData;
+    }
 
 
     public static ResponseData SUCCESS(){
