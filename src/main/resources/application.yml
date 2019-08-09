@@ -9,16 +9,24 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
+    password: redis
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://localhost:3306/mydb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT
+    url: jdbc:mysql://localhost:3306/demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT
     username: root
     password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    #    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
 
 #mybatis-plus:
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**.xml
   type-aliases-package: com.example.springboot.entity
 
-
+swagger:
+  enable=true:

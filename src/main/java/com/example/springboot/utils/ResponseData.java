@@ -77,7 +77,7 @@ public class ResponseData<T> implements Serializable {
         return responseData;
     }
 
-    public  boolean isSuccess(){
+    public  boolean yesOrNoSuccess(){
         if(code == SUCCESS_CODE){
             return true;
         }else{

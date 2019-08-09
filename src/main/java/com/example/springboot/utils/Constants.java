@@ -10,6 +10,9 @@ package com.example.springboot.utils;
 
 public class Constants {
 
+    public static final String PROJECT_NAME="yycrm";
+    public static final String NUll_CHAR="";
+
     public static enum status{
         SUCCESS(0,"成功"),
         ERROR(-1,"失败");
@@ -28,5 +31,8 @@ public class Constants {
             return msg;
         }
     }
+
+
+
 
 }

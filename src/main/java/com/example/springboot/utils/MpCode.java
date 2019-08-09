@@ -15,33 +15,33 @@ public class MpCode {
     @Test
     public void generateCode() {
         String packageName = "com.example.springboot";
-        boolean serviceNameStartWithI = true;//user -> UserService, 设置成true: user -> IUserService
+        boolean serviceNameStartWithI = false;//user -> UserService, 设置成true: user -> IUserService
         //需要的表名，多个表名传数组
-        generateByTables(serviceNameStartWithI, packageName, "sys_user");
+        generateByTables(serviceNameStartWithI, packageName, "user_info");
     }
 
 
     private void generateByTables(boolean serviceNameStartWithI, String packageName, String... tableNames) {
         String projectPath = System.getProperty("user.dir");
         GlobalConfig config = new GlobalConfig();
-        String dbUrl = "jdbc:mysql://localhost:3306/mydb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT";
+        String dbUrl = "jdbc:mysql://localhost:3306/demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT";
         DataSourceConfig dataSourceConfig = new DataSourceConfig();
         dataSourceConfig.setDbType(DbType.MYSQL)
                 .setUrl(dbUrl)
                 .setUsername("root")
                 .setPassword("root")
-                .setDriverName("com.mysql.cj.jdbc.Driver");
+                .setDriverName("com.mysql.jdbc.Driver");
         StrategyConfig strategyConfig = new StrategyConfig();
         strategyConfig
                 .setCapitalMode(true)
-                .setEntityLombokModel(false)
+                .setEntityLombokModel(true)
 //                .setDbColumnUnderline(true)
                 .setNaming(NamingStrategy.underline_to_camel)
                 .setInclude(tableNames);
         config.setActiveRecord(false)
-                .setAuthor("童志杰")
+                .setAuthor("tzj")
                 //代码生成目录
-                .setOutputDir(projectPath + "/src/main/java")
+                .setOutputDir(projectPath + "/src/main/java/demo")
                 .setFileOverride(true);
         if (!serviceNameStartWithI) {
             config.setServiceName("%sService");
