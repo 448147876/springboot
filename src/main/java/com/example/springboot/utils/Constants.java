@@ -12,6 +12,7 @@ public class Constants {
 
     public static final String PROJECT_NAME = "yycrm";
     public static final String NUll_CHAR = "";
+    public static final String CHAR_CHAR = ":";
 
 //    public static enum status{
 //        SUCCESS(0,"成功"),
@@ -38,6 +39,11 @@ public class Constants {
     public static enum httpState {
         SUCCESS(0, "成功"),
         ERROR(-1, "失败"),
+        PARAM_ERROR(1000100, "参数错误！"),
+        URLENCODER_ERROR(1000200, "网址编码错误！"),
+
+
+
         OK(200, "请求成功"),
         CREATED(201, "创建成功"),
         ACCEPTED(202, "更新成功"),

@@ -26,6 +26,11 @@ public class ResponseData<T> implements Serializable {
         responseData.setMsg(menuState.getMsg());
         return responseData;
     }
+    public static ResponseData RESPONSE(Constants.httpState menuState,String msg){
+        responseData.setCode(menuState.getCode());
+        responseData.setMsg(menuState.getMsg()+Constants.CHAR_CHAR+msg);
+        return responseData;
+    }
     public static<T> ResponseData RESPONSE(Constants.httpState menuState,T t){
         responseData.setCode(menuState.getCode());
         responseData.setMsg(menuState.getMsg());
