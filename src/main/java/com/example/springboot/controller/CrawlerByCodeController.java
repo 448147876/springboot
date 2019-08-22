@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * @Description: 遍历获取企业
+ * @Description: 企业获取
  *
  * @author: Tong
  * @date:  2019/8/16
@@ -27,5 +27,37 @@ public class CrawlerByCodeController {
     public void start( @PathVariable String areacode){
         crawlerByCodeService.start(areacode);
     }
+
+
+    /**
+     * 合并企业名称到企业表中
+     * @return
+     */
+    @GetMapping("/marageEnterpriseName")
+    public ResponseData marageEnterpriseName(){
+        crawlerByCodeService.marageEnterpriseName();
+        return ResponseData.SUCCESS("成功！");
+    }
+    /**
+     * 爬取企业信息（顺企网）
+     * @return
+     */
+    @GetMapping("/crawlersqw")
+    public ResponseData crawlersqw(){
+        crawlerByCodeService.crawlersqw();
+        return ResponseData.SUCCESS("成功！");
+    }
+
+
+    /**
+     * 爬取企业信息（天眼查）
+     * @return
+     */
+    @GetMapping("/crawlertyc")
+    public ResponseData crawlertyc(){
+        crawlerByCodeService.crawlertyc();
+        return ResponseData.SUCCESS("成功！");
+    }
+
 
 }

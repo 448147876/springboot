@@ -2,10 +2,6 @@ package com.example.springboot.rabbitmq;
 
 
 import com.example.springboot.config.RabbitConfig;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,7 +18,8 @@ public class RabbitMqUtil {
     public void send(String content) {
         rabbitTemplate.convertAndSend(EXCHANGE_DEFAULT, RabbitConfig.ROUTINGKEY_DEFAULT, content);
     }
-    public void send(String queueName,String content) {
+
+    public void send(String queueName, String content) {
 
         rabbitTemplate.convertAndSend(EXCHANGE_DEFAULT, queueName, content);
     }

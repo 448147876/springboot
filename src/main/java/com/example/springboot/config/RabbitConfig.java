@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -99,6 +100,14 @@ public class RabbitConfig {
     @Bean
     public Binding bindingDefault() {
         return BindingBuilder.bind(queueDefault()).to(defaultExchange()).with(ROUTINGKEY_DEFAULT);
+    }
+
+
+    @Bean
+    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public RabbitAdmin rabbitAdmin() {
+        RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory());
+        return rabbitAdmin;
     }
 
 
