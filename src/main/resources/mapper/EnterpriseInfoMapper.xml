@@ -19,7 +19,7 @@
         <result column="enterprise_info" property="enterpriseInfo" />
         <result column="main_product" property="mainProduct" />
         <result column="address" property="address" />
-        <result column="keys" property="keys" />
+        <result column="key_content" property="keyContent" />
         <result column="official_url" property="officialUrl" />
         <result column="resource_type" property="resourceType" />
         <result column="longitude" property="longitude" />
@@ -32,7 +32,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, enterprise_id, enterprise_name, legal_psn_name, registered_capital, register_date, industry_name, industry_code, registration_org, area_id, area_name, staff_size, enterprise_info, main_product, address, keys, official_url, resource_type, longitude, latitude, create_time, update_time, del_flag, remarks
+        id, enterprise_id, enterprise_name, legal_psn_name, registered_capital, register_date, industry_name, industry_code, registration_org, area_id, area_name, staff_size, enterprise_info, main_product, address, key_content, official_url, resource_type, longitude, latitude, create_time, update_time, del_flag, remarks
     </sql>
 
 </mapper>

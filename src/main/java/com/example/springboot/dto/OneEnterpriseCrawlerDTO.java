@@ -21,7 +21,10 @@ import java.util.List;
 @Accessors(chain = true)
 @ApiModel(value = "EnterpriseInfo对象", description = "企业表")
 public class OneEnterpriseCrawlerDTO implements Serializable {
-
+    /**
+     * 来源
+     */
+    private int source;
     private EnterpriseInfo enterpriseInfo;
     private List<PersionInfo> persionInfoList;
 

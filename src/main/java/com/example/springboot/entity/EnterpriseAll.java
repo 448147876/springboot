@@ -74,7 +74,7 @@ public class EnterpriseAll implements Serializable {
     private String address;
 
     @ApiModelProperty(value = "关键字")
-    private String keys;
+    private String keyContent;
 
     @ApiModelProperty(value = "官网")
     private String officialUrl;
