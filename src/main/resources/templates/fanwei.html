@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>点聚合</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <style>
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+        }
+
+        .input-card {
+            width: 25rem;
+        }
+
+        .input-card .btn {
+            width: 7rem;
+            margin-right: .7rem;
+        }
+
+        .input-card .btn:last-child {
+            margin-right: 0;
+        }
+        #panel {
+            /*position: fixed;*/
+            background-color: white;
+            max-height: 90%;
+            overflow-y: auto;
+            top: 10px;
+            right: 10px;
+            width: 280px;
+        }
+        #panel .amap-lib-driving {
+            border-radius: 4px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<div id="container" class="map" tabindex="0"></div>
+
+<div class="input-card" style="right: -50px; top: 40px;">
+    <span th:text="${centerx}" hidden="hidden" id="centerx">未知</span>
+    <span th:text="${centery}" hidden="hidden" id="centery">未知</span>
+    <h4>线路规划</h4>
+
+    <div class="input-item">
+        <div class="input-item-prepend"><span class="input-item-text">范围（公里）</span></div>
+        <input type="text" onkeyup="circleFun(this.value)"/>
+    </div>
+    <div class="input-item">
+        <div class="input-item-prepend"><span class="input-item-text">选择路径：</span></div>
+        <textarea rows="3" cols="20" id="pathName">
+
+        </textarea>
+    </div>
+    <div class="input-item">
+        <div class="input-item-prepend"><span class="input-item-text">点位路径：</span></div>
+        <textarea rows="3" cols="20" id="path">
+
+        </textarea>
+    </div>
+    <div class="input-item">
+        <button id="button" onclick="startdriving()" >导航 </button>
+    </div>
+    <div id="panel"></div>
+</div>
+<script type="text/javascript"
+        src="https://webapi.amap.com/maps?v=1.4.15&key=5bdde7d42e9f3be1d6fae14410f2297c&plugin=AMap.TruckDriving"></script>
+<script type="text/javascript">
+    var centerx = $("#centerx").text();
+    var centery = $("#centery").text();
+    var markers = [];
+    var map = new AMap.Map("container", {
+        resizeEnable: true,
+        center: [centerx, centery],
+        zoom: 10
+    });
+    addMarker();
+
+    // 实例化点标记
+    function addMarker() {
+        marker = new AMap.Marker({
+            icon: "https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png",
+            position: [centerx, centery]
+        });
+        marker.setMap(map);
+    }
+
+    var circle = null;
+
+    function circleFun(radius) {
+        var theEvent = window.event || e;
+        var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+        if (code != 13) {
+            return;
+        }
+
+        if (circle) {
+            map.remove(circle);
+        }
+        circle = new AMap.Circle({
+            center: [centerx, centery],
+            radius: radius * 1000, //半径
+            borderWeight: 3,
+            strokeColor: "#FF33FF",
+            strokeOpacity: 1,
+            strokeWeight: 6,
+            strokeOpacity: 0.2,
+            fillOpacity: 0.4,
+            strokeStyle: 'dashed',
+            strokeDasharray: [10, 10],
+            // 线样式还支持 'dashed'
+            fillColor: '#1791fc',
+            zIndex: 50,
+        });
+        circle.setMap(map)
+        // 缩放地图到合适的视野级别
+        map.setFitView([circle])
+        getPorint(radius * 1000);
+    }
+
+
+    // 到后端获取
+    function getPorint(distanct) {
+        $.ajax({
+            //请求方式
+            type: "GET",
+            async: true,
+            //请求地址
+            url: "http://127.0.0.1:8090/crawler/map/circle/" + distanct / 1000,
+            //请求成功
+            success: function (resultDate) {
+                if (resultDate) {
+                    var data = resultDate.data;
+                    if (data) {
+                        addPoint(data);
+                    }
+                }
+            },
+            //请求失败，包含具体的错误信息
+            error: function (e) {
+                console.log(e.status);
+            }
+        });
+    }
+
+
+    function addPoint(points) {
+        if (markers.length > 0) {
+            for (var i = 0; i < markers.length; i += 1) {
+                markers[i].setMap(null);
+            }
+        }
+        markers = [];
+        path = [];
+        // path.push(marker.getPosition());
+        if(polyline){
+            map.remove(polyline);
+        }
+
+
+
+        for (var i = 0; i < points.length; i += 1) {
+            var markerEach = new AMap.Marker({
+                map: map,
+                draggable: true,
+                position: [points[i].xside, points[i].yside],
+                title: points[i].name,
+                icon: "https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png"
+            });
+
+            markerEach.on('click', function () {
+                clickCustomerr(this);
+            });
+
+            markers.push(markerEach);
+        }
+
+    }
+
+    var path = [];
+    var pathName = [];
+    pathName.push("起点");
+    var polyline=null;
+    //点击客户事件
+    function clickCustomerr(markerEach) {
+        if (markerEach.getIcon() == 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png') {
+            alert("请不要重复选择！");
+            return;
+        }
+        markerEach.setAnimation('AMAP_ANIMATION_BOUNCE');
+        markerEach.setIcon("https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png");
+        path.push(markerEach.getPosition());
+        pathName.push(markerEach.getTitle());
+        $("#pathName").val(pathName);
+        $("#path").val(path);
+        if(polyline){
+            map.remove(polyline);
+        }
+        polyline = new AMap.Polyline({
+            map: map,
+            path: path,
+            isOutline: true,
+            outlineColor: '#ffeeff',
+            borderWeight: 1,
+            strokeColor: "#3366FF",
+            strokeOpacity: 1,
+            strokeWeight: 2,
+            // 折线样式还支持 'dashed'
+            strokeStyle: "solid",
+            // strokeStyle是dashed时有效
+            strokeDasharray: [10, 5],
+            lineJoin: 'round',
+            lineCap: 'round',
+            zIndex: 50
+        })
+    }
+
+
+    var  truckOptions = {
+        map: map,
+        policy:0,
+        size:1,
+        panel:'panel'
+    };
+    var driving = new AMap.TruckDriving(truckOptions);
+    function startdriving() {
+
+        path.splice(0,0,marker.getPosition());
+        path.push(marker.getPosition());
+        var pathDriving=[];
+        $.each(path, function (i, pathOne) {
+            // pathDriving.push({lnglat:[pathOne.lng,pathOne.lat]});
+            pathDriving.push({lnglat:[pathOne.lng, pathOne.lat]});
+        });
+
+
+
+        driving.search(pathDriving, function(status, result) {
+            // result即是对应的货车导航信息，相关数据结构文档请参考 https://lbs.amap.com/api/javascript-api/reference/route-search#m_DrivingResult
+            if (status === 'complete') {
+
+            } else {
+
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

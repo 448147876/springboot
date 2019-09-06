@@ -2,14 +2,12 @@ package com.example.springboot.controller;
 
 
 import com.example.springboot.service.IAreainfoService;
-import com.example.springboot.service.impl.AreainfoServiceImpl;
 import com.example.springboot.utils.Constants;
 import com.example.springboot.utils.ResponseData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,11 +26,6 @@ public class AreainfoController {
     IAreainfoService areainfoService;
 
 
-    @GetMapping("/al")
-    public ResponseData areaInfoFromAlMap(){
-        areainfoService.areaInfoFromAlMap();
-        return ResponseData.SUCCESS(Constants.httpState.OK);
-    }
 
 
 }
