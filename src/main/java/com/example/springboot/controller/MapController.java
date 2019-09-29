@@ -4,6 +4,9 @@ package com.example.springboot.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.springboot.dto.MapLatLngDTO;
+import com.example.springboot.dto.MapResult;
+import com.example.springboot.dto.Poi;
+import com.example.springboot.dto.PoiList;
 import com.example.springboot.entity.Areainfo;
 import com.example.springboot.entity.UserInfo;
 import com.example.springboot.prefix.MapKey;
@@ -11,6 +14,7 @@ import com.example.springboot.service.impl.AreainfoServiceImpl;
 import com.example.springboot.service.impl.CustomerpoolServiceImpl;
 import com.example.springboot.utils.RedisUtils;
 import com.example.springboot.utils.ResponseData;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -205,5 +210,57 @@ public class MapController {
         System.out.println(JSONObject.toJSONString(list));
         System.out.println(System.currentTimeMillis());
     }
+
+
+
+
+
+
+
+
+
+    /**
+     * 搜索
+     * @return
+     */
+    @RequestMapping("/select")
+    public String mapselect(Model model){
+
+
+
+
+//        model.addAttribute("centerx", centerx);
+//        model.addAttribute("centery", centery);
+        return "select";
+    }
+
+
+    /**
+     * 获取指定点附近数量
+     * @return
+     */
+    @GetMapping("/page")
+    @ResponseBody
+    public MapResult getLatLngByPage(MapLatLngDTO mapLatLngDTO,Integer pageCount){
+        PageInfo<MapLatLngDTO> pageInfo = customerpoolService.selectByDistanctPage(pageCount, mapLatLngDTO.getXSide(), mapLatLngDTO.getYSide());
+        MapResult mapResult = new MapResult();
+        mapResult.setInfo("ok");
+        PoiList poiList = new PoiList();
+        poiList.setCount((int) pageInfo.getTotal());
+        poiList.setPageIndex(pageCount);
+        poiList.setPageSize(10);
+        List<Poi> list = Lists.newLinkedList();
+        for(MapLatLngDTO mapLatLngDTOEach:pageInfo.getList()){
+            Poi poi = new Poi();
+            poi.setAddress(mapLatLngDTOEach.getAddress());
+            poi.setName(mapLatLngDTOEach.getName());
+            poi.setLocation("lng:"+mapLatLngDTOEach.getXSide()+",lat:"+mapLatLngDTOEach.getYSide());
+            list.add(poi);
+        }
+        poiList.setPois(list);
+        mapResult.setPoiList(poiList);
+        return mapResult;
+    }
+
 
 }

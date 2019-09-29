@@ -5,6 +5,8 @@ import com.example.springboot.dto.MapLatLngDTO;
 import com.example.springboot.entity.Customerpool;
 import com.example.springboot.mapper.CustomerpoolMapper;
 import com.example.springboot.service.ICustomerpoolService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,28 @@ public class CustomerpoolServiceImpl extends ServiceImpl<CustomerpoolMapper, Cus
     @Override
     public List<MapLatLngDTO> selectByAll() {
         return baseMapper.selectByAll();
+    }
+
+    @Override
+    public PageInfo selectByDistanctPage(Integer pageCount, double centerx, double centery) {
+        PageHelper.startPage(pageCount,10);
+        //度数，距离内度数的范围，缩小范围
+        double distanct = 50d;
+        double limitLngLat = 1d/111d*distanct;
+        List<MapLatLngDTO>  latLngDTOS =  baseMapper.selectByDistanct(centerx,centery,distanct,limitLngLat);
+        PageInfo<MapLatLngDTO> pageinfo = new PageInfo<>(latLngDTOS);
+
+        long total = pageinfo.getTotal();
+        if(total < 100){
+            distanct = 200d;
+            PageHelper.startPage(pageCount,10);
+            limitLngLat = 1d/111d*distanct;
+            latLngDTOS =  baseMapper.selectByDistanct(centerx,centery,distanct,limitLngLat);
+            pageinfo = new PageInfo<>(latLngDTOS);
+        }
+
+
+        return pageinfo;
     }
 
 }

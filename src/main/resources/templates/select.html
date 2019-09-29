@@ -1,0 +1,371 @@
+<!-- AMap.PlaceSearch + jquery.twbsPagination -->
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <!-- 原始地址：//webapi.amap.com/ui/1.0/ui/misc/MarkerList/examples/pagination.html -->
+    <base href="https://webapi.amap.com/ui/1.0/ui/misc/MarkerList/examples/" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>搜索+分页</title>
+    <link rel="stylesheet" type="text/css" href="./index.css">
+    <link rel="stylesheet" type="text/css" href="https://a.amap.com/amap-ui/static/1.0/ui/misc/MarkerList/examples/pagination.css">
+    <style>
+        #keywords {
+            position: absolute;
+            right: 310px;
+            top: 7px;
+            line-height: 200%;
+            padding: 0 5px;
+            font-size: 13;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            width: 150px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="outer-box">
+    <div id="container" tabindex="0"></div>
+    <input type="text" id="keywords" value="博物馆" />
+    <div id="panel" class="scrollbar1">
+        <ul id="pagination-demo" class="pagination-sm"></ul>
+        <ul id="myList">
+        </ul>
+    </div>
+</div>
+<script type="text/javascript" src="https://webapi.amap.com/ui/1.0/plug/ext/jquery-1.12.4.min.js?v=1.0.11"></script>
+<script type="text/javascript" src="https://a.amap.com/amap-ui/static/1.0/ui/misc/MarkerList/examples/jquery.twbsPagination.min.js?v=1.0.11"></script>
+<script type="text/javascript" src='https://webapi.amap.com/maps?v=1.4.15&key=5bdde7d42e9f3be1d6fae14410f2297c&plugin=AMap.DistrictSearch,AMap.MarkerClusterer'></script>
+<!-- UI组件库 1.0 -->
+<script src="https://webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+<script type="text/javascript">
+    //创建地图
+    var map = new AMap.Map('container', {
+        resizeEnable: true,
+        zoom: 12
+    });
+    //获取当前所在城市的中心点
+    console.log(map.getCenter());
+
+    AMapUI.loadUI(['misc/MarkerList', 'overlay/SimpleMarker', 'overlay/SimpleInfoWindow'],
+        function(MarkerList, SimpleMarker, SimpleInfoWindow) {
+
+            //即jQuery/Zepto
+            var $ = MarkerList.utils.$;
+
+            var defaultIconStyle = function(index) {
+                    return 'red-' + (index + 1);
+                }, //默认的图标样式
+                hoverIconStyle = function(index) {
+                    return 'blue-' + (index + 1);
+                }, //鼠标hover时的样式
+                selectedIconStyle = function(index) {
+                    return 'blue-' + (index + 1);
+                } //选中时的图标样式
+            ;
+
+
+
+            var markerList = new MarkerList({
+                map: map,
+                //ListElement对应的父节点或者ID
+                listContainer: "myList", //document.getElementById("myList"),
+                //选中后显示
+
+                //从数据中读取位置, 返回lngLat
+                getPosition: function(item) {
+                    return item.location;
+                },
+                //数据ID，如果不提供，默认使用数组索引，即index
+                getDataId: function(item, index) {
+
+                    return item.id;
+                },
+                getInfoWindow: function(data, context, recycledInfoWindow) {
+
+                    if (recycledInfoWindow) {
+
+                        recycledInfoWindow.setInfoTitle(data.name);
+                        recycledInfoWindow.setInfoBody(data.address);
+
+                        return recycledInfoWindow;
+                    }
+
+                    return new SimpleInfoWindow({
+                        infoTitle: data.name,
+                        infoBody: data.address,
+                        offset: new AMap.Pixel(0, -32)
+                    });
+                },
+                //构造marker用的options对象, content和title支持模板，也可以是函数，返回marker实例，或者返回options对象
+                getMarker: function(data, context, recycledMarker) {
+
+                    if (recycledMarker) {
+                        recycledMarker.setIconStyle(defaultIconStyle(context.index));
+                        return;
+                    }
+
+                    return new SimpleMarker({
+                        iconTheme: 'numv1',
+                        containerClassNames: 'my-marker',
+                        iconStyle: defaultIconStyle(context.index),
+                    });
+                },
+                //构造列表元素，与getMarker类似，可以是函数，返回一个dom元素，或者模板 html string
+                getListElement: function(data, context, recycledListElement) {
+
+                    var label = '' + (context.index + 1);
+
+                    //使用模板创建
+                    var innerHTML = MarkerList.utils.template(
+                        '<% if(data.photos && data.photos[0]) { %>' +
+                        '<div class="poi-imgbox">' +
+                        '    <span class="poi-img" style="background-image:url(<%- data.photos[0].url %>)"></span>' +
+                        '</div>' +
+                        '<% } %>' +
+                        '<div class="poi-info-left">' +
+                        '    <h3 class="poi-title">' +
+                        '        <%- label %>. <%- data.name %>' +
+                        '    </h3>' +
+                        '    <div class="poi-info">' +
+                        '        <p class="poi-addr">地址：<%- data.address %></p>' +
+                        '<% if(data.tel ){ %>' +
+                        '        <p class="poi-addr">电话：<%- data.tel %></p>' +
+                        '<% } %>' +
+                        '    </div>' +
+                        '</div>' +
+                        '<div class="clear"></div>', {
+                            data: data,
+                            label: label
+                        });
+
+                    if (recycledListElement) {
+                        recycledListElement.innerHTML = innerHTML;
+                        return recycledListElement;
+                    }
+
+                    return '<li class="poibox">' +
+                        innerHTML +
+                        '</li>';
+                },
+                //列表节点上监听的事件
+                listElementEvents: ['click', 'mouseenter', 'mouseleave'],
+                //marker上监听的事件
+                markerEvents: ['click', 'mouseover', 'mouseout'],
+                //makeSelectedEvents:false,
+                selectedClassNames: 'selected',
+                autoSetFitView: true
+            });
+
+            window.markerList = markerList;
+
+            AMap.plugin(["AMap.PlaceSearch"], function() {
+
+                var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
+                    pageSize: 5,
+                    pageIndex: 1,
+                    extensions: 'all',
+                    city: "010" //城市
+                });
+
+                var $pagination = $('#pagination-demo');
+
+                function initPagination(page, totalPages) {
+
+                    //初始化分页器
+                    $pagination.twbsPagination({
+                        totalPages: totalPages,
+                        startPage: page,
+                        prev: null,
+                        first: '首页',
+                        next: '下一页',
+                        last: null,
+                        initiateStartPageClick: false,
+                        onPageClick: function(event, page) {
+                            goPage(page);
+                        }
+                    });
+                }
+
+
+
+                var $keywords = $('#keywords');
+
+                function goPage(page) {
+
+                    //设置当前页
+                    placeSearch.setPageIndex(page);
+                    //关键字查询
+                    $.ajax({
+                        //请求方式
+                        type: "GET",
+                        async: true,
+                        //请求地址
+                        url: "http://127.0.0.1:8090/crawler/map/name/" + $keywords.val(),
+                        //请求成功
+                        success: function (resultDate) {
+                            var data = resultDate.data;
+                            if (data) {
+                                addPoint(data);
+                            }
+                        },
+                        //请求失败，包含具体的错误信息
+                        error: function (e) {
+                            console.log(e.status);
+                        }
+                    });
+
+
+                    // placeSearch.search($keywords.val(), function(status, result) {
+                    //
+                    //     if (status !== 'complete') {
+                    //         alert('返回数据出错!');
+                    //     }
+                    //
+                    //     //render当前页的数据
+                    //     markerList.render(result.poiList.pois);
+                    //
+                    //     if (inited == 1) {
+                    //         //首次初始化
+                    //         initPagination(page, Math.ceil(result.poiList.count / result.poiList.pageSize));
+                    //     }
+                    //
+                    // });
+                }
+
+
+
+
+                var markers = [];
+
+                //将点标到地图上
+                function addPoint(points) {
+                    if (markers.length > 0) {
+                        for (var i = 0; i < markers.length; i += 1) {
+                            markers[i].setMap(null);
+                        }
+                    }
+                    markers = [];
+
+
+
+                    for (var i = 0; i < points.length; i += 1) {
+                        var markerEach = new AMap.Marker({
+                            map: map,
+                            draggable: true,
+                            position: [points[i].xside, points[i].yside],
+                            title: points[i].name,
+                            icon: "https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png"
+                        });
+
+                        markerEach.on('click', function () {
+                            clickCustomerr(this);
+                        });
+
+                        markers.push(markerEach);
+
+                    }
+                }
+
+                //点击客户事件
+                function clickCustomerr(markerEach) {
+                debugger;
+                    // markerEach.setAnimation('AMAP_ANIMATION_BOUNCE');
+                    markerEach.setIcon("https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png");
+                    $.ajax({
+                        //请求方式
+                        type: "GET",
+                        async: true,
+                        //请求地址
+                        dataType:"json",
+                        data:{"pageCount":1,"xSide":markerEach.B.position.lng,"ySide":markerEach.B.position.lat},
+                        url: "http://127.0.0.1:8090/crawler/map/page",
+                        //请求成功
+                        success: function (result) {
+                            markerList.render(result.poiList.pois);
+                            if (inited == 1) {
+                                //首次初始化
+                                initPagination(page, Math.ceil(result.poiList.count / result.poiList.pageSize));
+                            }
+                        },
+                        //请求失败，包含具体的错误信息
+                        error: function (e) {
+                            console.log(e.status);
+                        }
+                    });
+                }
+
+
+                // goPage(1);
+                var inited = 0;
+                $keywords.on('keypress', function(e) {
+                    if (e.which === 13) {
+                        inited = inited+1;
+                        $pagination.twbsPagination('destroy');
+                        goPage(1);
+                    }
+                });
+            });
+
+            markerList.on('selectedChanged', function(event, info) {
+
+                if (info.selected) {
+
+                    if (info.selected.marker) {
+                        //更新为选中样式
+                        info.selected.marker.setIconStyle(selectedIconStyle(info.selected.index));
+                    }
+                }
+
+                if (info.unSelected && info.unSelected.marker) {
+                    //更新为默认样式
+                    info.unSelected.marker.setIconStyle(defaultIconStyle(info.unSelected.index));
+                }
+            });
+
+
+            markerList.on('listElementMouseenter markerMouseover', function(event, record) {
+
+                if (record && record.marker) {
+                    //非选中的id
+                    if (!this.isSelectedDataId(record.id)) {
+                        //设置为hover样式
+                        record.marker.setIconStyle(hoverIconStyle(record.index));
+                        //this.closeInfoWindow();
+                    }
+                }
+            });
+
+            markerList.on('listElementMouseleave markerMouseout', function(event, record) {
+
+                if (record && record.marker) {
+
+                    if (!this.isSelectedDataId(record.id)) {
+                        //恢复默认样式
+                        record.marker.setIconStyle(defaultIconStyle(record.index));
+                    }
+                }
+            });
+
+
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+
+</html>
