@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.CustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.springboot.entity.Customer">
+        <id column="ID" property="id" />
+        <result column="Name" property="Name" />
+        <result column="CompanyType" property="CompanyType" />
+        <result column="Address" property="Address" />
+        <result column="BusinessLicence" property="BusinessLicence" />
+        <result column="CompanyUrl" property="CompanyUrl" />
+        <result column="ManageingDirector" property="ManageingDirector" />
+        <result column="AreaID" property="AreaID" />
+        <result column="Email" property="Email" />
+        <result column="MobilePhone" property="MobilePhone" />
+        <result column="Phone" property="Phone" />
+        <result column="AddTime" property="AddTime" />
+        <result column="UpdateTime" property="UpdateTime" />
+        <result column="X_Side" property="xSide" />
+        <result column="Y_Side" property="ySide" />
+        <result column="adduser" property="adduser" />
+        <result column="UserLevel" property="UserLevel" />
+        <result column="KeyWord" property="KeyWord" />
+        <result column="CompanyDescript" property="CompanyDescript" />
+        <result column="WebSite" property="WebSite" />
+        <result column="EmployCount" property="EmployCount" />
+        <result column="CreateTime" property="CreateTime" />
+        <result column="SourceType" property="SourceType" />
+        <result column="AreaCode" property="AreaCode" />
+        <result column="BusinessMode" property="BusinessMode" />
+        <result column="MainProducts" property="MainProducts" />
+        <result column="BusinessIndustry" property="BusinessIndustry" />
+        <result column="JobID" property="JobID" />
+        <result column="RegisteredCapital" property="RegisteredCapital" />
+        <result column="StaffSize" property="StaffSize" />
+        <result column="LegalRepresentative" property="LegalRepresentative" />
+        <result column="OrganizationCode" property="OrganizationCode" />
+        <result column="TaxNumber" property="TaxNumber" />
+        <result column="ProtectOrNot" property="ProtectOrNot" />
+        <result column="FinancingPsnName" property="FinancingPsnName" />
+        <result column="FinancingPsnPost" property="FinancingPsnPost" />
+        <result column="FinancingPhone" property="FinancingPhone" />
+        <result column="ClaimType" property="ClaimType" />
+        <result column="ClaimPsnId" property="ClaimPsnId" />
+        <result column="ClaimTime" property="ClaimTime" />
+        <result column="PutStorageCount" property="PutStorageCount" />
+        <result column="PutStorageTime" property="PutStorageTime" />
+        <result column="customer_code" property="customerCode" />
+        <result column="bank_account" property="bankAccount" />
+        <result column="bank_name" property="bankName" />
+        <result column="year_output_value" property="yearOutputValue" />
+        <result column="hw_type" property="hwType" />
+        <result column="customer_type" property="customerType" />
+        <result column="first_signing_date" property="firstSigningDate" />
+        <result column="first_contact_date" property="firstContactDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, Name, CompanyType, Address, BusinessLicence, CompanyUrl, ManageingDirector, AreaID, Email, MobilePhone, Phone, AddTime, UpdateTime, X_Side, Y_Side, adduser, UserLevel, KeyWord, CompanyDescript, WebSite, EmployCount, CreateTime, SourceType, AreaCode, BusinessMode, MainProducts, BusinessIndustry, JobID, RegisteredCapital, StaffSize, LegalRepresentative, OrganizationCode, TaxNumber, ProtectOrNot, FinancingPsnName, FinancingPsnPost, FinancingPhone, ClaimType, ClaimPsnId, ClaimTime, PutStorageCount, PutStorageTime, customer_code, bank_account, bank_name, year_output_value, hw_type, customer_type, first_signing_date, first_contact_date
+    </sql>
+
+</mapper>

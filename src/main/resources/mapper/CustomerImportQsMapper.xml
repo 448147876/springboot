@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.CustomerImportQsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.springboot.entity.CustomerImportQs">
+        <id column="id" property="id" />
+        <result column="enterprise_name" property="enterpriseName" />
+        <result column="orange_code" property="orangeCode" />
+        <result column="address" property="address" />
+        <result column="industry" property="industry" />
+        <result column="enterprise_type" property="enterpriseType" />
+        <result column="area_code" property="areaCode" />
+        <result column="register_address" property="registerAddress" />
+        <result column="main_production" property="mainProduction" />
+        <result column="production" property="production" />
+        <result column="synopsis" property="synopsis" />
+        <result column="business_scope" property="businessScope" />
+        <result column="registered_capital" property="registeredCapital" />
+        <result column="register_date" property="registerDate" />
+        <result column="web_url" property="webUrl" />
+        <result column="business_statue" property="businessStatue" />
+        <result column="management_forms" property="managementForms" />
+        <result column="legal_psn_name" property="legalPsnName" />
+        <result column="psn_name" property="psnName" />
+        <result column="dept" property="dept" />
+        <result column="phone" property="phone" />
+        <result column="mobel_phone" property="mobelPhone" />
+        <result column="email" property="email" />
+        <result column="qq" property="qq" />
+        <result column="remark" property="remark" />
+        <result column="contant_html" property="contantHtml" />
+        <result column="contant_str" property="contantStr" />
+        <result column="business_info_html" property="businessInfoHtml" />
+        <result column="business_info_str" property="businessInfoStr" />
+        <result column="qq_bak" property="qqBak" />
+        <result column="mobel_phone_bak" property="mobelPhoneBak" />
+        <result column="phone_bak" property="phoneBak" />
+        <result column="email_bak" property="emailBak" />
+        <result column="web_url_bak" property="webUrlBak" />
+        <result column="source_type" property="sourceType" />
+        <result column="job_id" property="jobId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, enterprise_name, orange_code, address, industry, enterprise_type, area_code, register_address, main_production, production, synopsis, business_scope, registered_capital, register_date, web_url, business_statue, management_forms, legal_psn_name, psn_name, dept, phone, mobel_phone, email, qq, remark, contant_html, contant_str, business_info_html, business_info_str, qq_bak, mobel_phone_bak, phone_bak, email_bak, web_url_bak, source_type, job_id
+    </sql>
+
+</mapper>
