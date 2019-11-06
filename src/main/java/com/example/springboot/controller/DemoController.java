@@ -101,7 +101,7 @@ public class DemoController {
      *
      * @return
      */
-    @PostMapping("redis")
+    @GetMapping("redisin")
     @ApiOperation(value = "新增redis数据", notes = "对象写入redis中")
     public ResponseData redisDemo2() {
 
