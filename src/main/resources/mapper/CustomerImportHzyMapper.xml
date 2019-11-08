@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.CustomerImportHzyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.springboot.entity.CustomerImportHzy">
+        <id column="id" property="id" />
+        <result column="enterprise_name_title" property="enterpriseNameTitle" />
+        <result column="enterprise_name_choose" property="enterpriseNameChoose" />
+        <result column="contant_html" property="contantHtml" />
+        <result column="contant_str" property="contantStr" />
+        <result column="business_info_html" property="businessInfoHtml" />
+        <result column="business_info_str" property="businessInfoStr" />
+        <result column="email_bak" property="emailBak" />
+        <result column="mobel_phone_bak" property="mobelPhoneBak" />
+        <result column="remark" property="remark" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, enterprise_name_title, enterprise_name_choose, contant_html, contant_str, business_info_html, business_info_str, email_bak, mobel_phone_bak, remark
+    </sql>
+
+</mapper>

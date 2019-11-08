@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.CustomeruserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.springboot.entity.Customeruser">
+        <id column="ID" property="id" />
+        <result column="CustomerID" property="CustomerID" />
+        <result column="RealName" property="RealName" />
+        <result column="Sex" property="Sex" />
+        <result column="Age" property="Age" />
+        <result column="nation" property="nation" />
+        <result column="Position" property="Position" />
+        <result column="IsUser" property="IsUser" />
+        <result column="MobilePhone" property="MobilePhone" />
+        <result column="Email" property="Email" />
+        <result column="QQ" property="qq" />
+        <result column="AddTime" property="AddTime" />
+        <result column="UpdateTime" property="UpdateTime" />
+        <result column="Adduser" property="Adduser" />
+        <result column="Usabled" property="Usabled" />
+        <result column="SourcType" property="SourcType" />
+        <result column="JobID" property="JobID" />
+        <result column="birth_date" property="birthDate" />
+        <result column="native_place" property="nativePlace" />
+        <result column="phone" property="phone" />
+        <result column="department" property="department" />
+        <result column="fax_number" property="faxNumber" />
+        <result column="wechart" property="wechart" />
+        <result column="main_contact_or_not" property="mainContactOrNot" />
+        <result column="married_or_not" property="marriedOrNot" />
+        <result column="married_date" property="marriedDate" />
+        <result column="mate_name" property="mateName" />
+        <result column="has_child_or_not" property="hasChildOrNot" />
+        <result column="child_birthday" property="childBirthday" />
+        <result column="taste" property="taste" />
+        <result column="del_flag" property="delFlag" />
+        <result column="remarks" property="remarks" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, CustomerID, RealName, Sex, Age, nation, Position, IsUser, MobilePhone, Email, QQ, AddTime, UpdateTime, Adduser, Usabled, SourcType, JobID, birth_date, native_place, phone, department, fax_number, wechart, main_contact_or_not, married_or_not, married_date, mate_name, has_child_or_not, child_birthday, taste, del_flag, remarks
+    </sql>
+    <select id="listNotContent" resultType="com.example.springboot.entity.Customeruser">
+        SELECT
+            <include refid="Base_Column_List" />
+        FROM
+            customeruser c
+        WHERE
+            c.CustomerID = #{customerId}
+            AND c.RealName IS NOT NULL
+            AND c.RealName <![CDATA[ <> ]]> ''
+        <if test="mobilePhone != null and phone != null">
+            AND (
+            (c.MobilePhone IS NOT NULL AND c.MobilePhone <![CDATA[ <> ]]> '')
+            OR (c.phone IS NOT NULL AND c.phone <![CDATA[ <> ]]> '')
+            )
+        </if>
+        <if test="mobilePhone != null and phone == null">
+            AND (c.MobilePhone IS NOT NULL AND c.MobilePhone <![CDATA[ <> ]]> '')
+        </if>
+        <if test="mobilePhone == null and phone != null">
+            AND (c.phone IS NOT NULL AND c.phone <![CDATA[ <> ]]> '')
+        </if>
+
+    </select>
+
+</mapper>

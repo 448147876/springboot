@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.CustomerImportMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.springboot.entity.CustomerImport">
+        <id column="id" property="id" />
+        <result column="CustomerName" property="CustomerName" />
+        <result column="PsnName" property="PsnName" />
+        <result column="PsnMobelPhone" property="PsnMobelPhone" />
+        <result column="PsnPhone" property="PsnPhone" />
+        <result column="Email" property="Email" />
+        <result column="Address" property="Address" />
+        <result column="CompanyType" property="CompanyType" />
+        <result column="ExtensionNum" property="ExtensionNum" />
+        <result column="BusinessIndustry" property="BusinessIndustry" />
+        <result column="MainProducts" property="MainProducts" />
+        <result column="FaxNo" property="FaxNo" />
+        <result column="remarks" property="remarks" />
+        <result column="CreateTime" property="CreateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, CustomerName, PsnName, PsnMobelPhone, PsnPhone, Email, Address, CompanyType, ExtensionNum, BusinessIndustry, MainProducts, FaxNo, remarks, CreateTime
+    </sql>
+
+</mapper>

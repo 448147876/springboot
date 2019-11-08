@@ -1,4 +1,4 @@
-package com.example.springboot.job;//package com.xe.demo.common.job;
+//package com.example.springboot.job;
 //
 //import java.text.SimpleDateFormat;
 //import java.util.Date;
@@ -9,7 +9,6 @@ package com.example.springboot.job;//package com.xe.demo.common.job;
 //
 ///**
 // * 定义一个任务(定时输出)
-// * @author CZH
 // */
 //public class ScheduledJob implements Job {
 //	private SimpleDateFormat dateFormat() {

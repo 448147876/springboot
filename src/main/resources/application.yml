@@ -21,9 +21,13 @@ spring:
         min-idle: 0
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://47.111.151.105:3306/hyd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT
-    username: root
-    password: root
+#    url: jdbc:mysql://47.111.151.105:3306/hyd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT
+#    url: jdbc:mysql://192.168.0.175:3307/hyd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT
+#    username: root
+#    password: root#
+    url: jdbc:mysql://rm-bp19266526199q43p9o.mysql.rds.aliyuncs.com:3306/hyd_put
+    username: yycceg
+    password: YYcceg!@#
     #    driver-class-name: com.mysql.cj.jdbc.Driver
     driver-class-name: com.mysql.jdbc.Driver
 
@@ -41,5 +45,10 @@ pagehelper:
 
 swagger:
   enable=true:
+
+
+logging:
+  level:
+    com.example.springboot.mapper : debug
 
 
