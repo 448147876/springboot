@@ -12,6 +12,7 @@ import com.example.springboot.service.impl.CustomerImportSqwServiceImpl;
 import com.example.springboot.service.impl.CustomerServiceImpl;
 import com.example.springboot.service.impl.CustomeruserServiceImpl;
 import com.example.springboot.utils.ResponseData;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -246,6 +247,76 @@ public class CustomerController {
 
         return ResponseData.SUCCESS();
     }
+
+    /**
+     * 分配已经匹配的客户给用户
+     * @return
+     */
+    @GetMapping("distributionCustomer")
+    public ResponseData distributionCustomer(){
+        QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.isNotNull("JobID");
+        queryWrapper.isNull("handle_user_id");
+        List<Customer> list = customerService.list(queryWrapper);
+        if(list == null || list.isEmpty()){
+            return ResponseData.SUCCESS("没有需要分配的");
+        }
+        int countUser = 0;
+        List<Integer> listUserId = Lists.newLinkedList();
+        listUserId.add(37);
+        listUserId.add(38);
+        listUserId.add(39);
+//        listUserId.add(40);
+        for(Customer customer:list){
+            countUser++;
+            Integer userId = listUserId.get(countUser%3);
+            Customer customerNew = new Customer();
+            customerNew.setHandleUserId(userId);
+            QueryWrapper<Customer> customerQueryWrapper = new QueryWrapper<>();
+            customerQueryWrapper.eq("id",customer.getId());
+            customerService.update(customerNew,customerQueryWrapper);
+        }
+
+
+        return ResponseData.SUCCESS("本次分配完成 "+countUser+" 个客户");
+    }
+    /**
+     * 从抓取的数据中获取数据
+     * @return
+     */
+    @GetMapping("customerData")
+    public ResponseData handleQSData(){
+        //本次抓取号
+        int jobId = (int)(1+Math.random()*10000);
+        //获取所有新抓取的数据
+        QueryWrapper<CustomerImportQs> qsQueryWrapper = new QueryWrapper<>();
+        qsQueryWrapper.isNull("job_id");
+        List<CustomerImportQs> customerImportQsList = customerImportQsService.list(qsQueryWrapper);
+        if(customerImportQsList == null || customerImportQsList.isEmpty()){
+            return ResponseData.SUCCESS("没有新抓取的数据");
+        }
+        //循环处理
+        for(CustomerImportQs customerImportQsEach:customerImportQsList){
+            String enterpriseName = customerImportQsEach.getEnterpriseName();
+            enterpriseName = StringUtils.remove(enterpriseName," ");
+            QueryWrapper<Customer> customerQueryWrapper = new QueryWrapper<>();
+            customerQueryWrapper.eq("Name",enterpriseName);
+            Customer customerOld = customerService.getOne(customerQueryWrapper);
+            if(customerOld == null){
+                continue;
+            }
+            //工商信息处理
+            customerService.getBussinessInfo(customerOld,customerImportQsEach,jobId);
+            //联系人处理
+            customeruserService.handleContenct(customerImportQsEach, customerOld,jobId);
+            customerImportQsEach.setJobId(jobId);
+            customerImportQsService.updateById(customerImportQsEach);
+
+        }
+
+        return ResponseData.SUCCESS("处理完成");
+    }
+
 
 
 }

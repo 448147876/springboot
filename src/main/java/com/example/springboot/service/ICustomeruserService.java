@@ -1,5 +1,7 @@
 package com.example.springboot.service;
 
+import com.example.springboot.entity.Customer;
+import com.example.springboot.entity.CustomerImportQs;
 import com.example.springboot.entity.Customeruser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -16,4 +18,7 @@ import java.util.List;
 public interface ICustomeruserService extends IService<Customeruser> {
 
     List<Customeruser> listNotContent(Integer customerId,String realName, String mobilePhone, String phone);
+
+
+    void handleContenct(CustomerImportQs customerImportQsEach, Customer customerOld,Integer jobId);
 }

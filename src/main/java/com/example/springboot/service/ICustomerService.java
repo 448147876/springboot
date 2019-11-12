@@ -2,6 +2,7 @@ package com.example.springboot.service;
 
 import com.example.springboot.entity.Customer;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.springboot.entity.CustomerImportQs;
 
 import java.util.List;
 
@@ -16,4 +17,7 @@ import java.util.List;
 public interface ICustomerService extends IService<Customer> {
 
     List<Customer> findCustomerNotHandle();
+
+    void getBussinessInfo(Customer customerOld, CustomerImportQs customerImportQsEach,Integer jobId);
+
 }
