@@ -3,6 +3,7 @@ package com.example.springboot.service;
 import com.example.springboot.entity.Customer;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.springboot.entity.CustomerImportQs;
+import com.example.springboot.utils.ResponseData;
 
 import java.util.List;
 
@@ -20,4 +21,9 @@ public interface ICustomerService extends IService<Customer> {
 
     void getBussinessInfo(Customer customerOld, CustomerImportQs customerImportQsEach,Integer jobId);
 
+    List<String> listOne(String sourceName);
+
+    ResponseData<Customer> handleDataByQcc(String htmlStr,String name);
+
+    ResponseData<Customer> saveInfoToDb(Customer customer);
 }

@@ -13,8 +13,8 @@ public class ResponseData<T> implements Serializable {
 
     private final static ResponseData responseData = new ResponseData();
 
-    private static int SUCCESS_CODE= Constants.httpState.SUCCESS.getCode();
-    private static int ERROR_CODE = Constants.httpState.ERROR.getCode();
+    public static int SUCCESS_CODE= Constants.httpState.SUCCESS.getCode();
+    public static int ERROR_CODE = Constants.httpState.ERROR.getCode();
 
     public int code;
     public String msg;
@@ -38,7 +38,7 @@ public class ResponseData<T> implements Serializable {
         responseData.setCode(SUCCESS_CODE);
         return responseData;
     }
-    public static ResponseData SUCCESS(String msg){
+    public static ResponseData SUCCESSMSG(String msg){
         responseData.setCode(SUCCESS_CODE);
         responseData.setMsg(msg);
         return responseData;
@@ -48,7 +48,7 @@ public class ResponseData<T> implements Serializable {
         responseData.setData(data);
         return responseData;
     }
-    public static<T> ResponseData SUCCESS(T t,String msg){
+    public static<T> ResponseData SUCCESS(T t, String msg){
         responseData.setCode(SUCCESS_CODE);
         responseData.setMsg(msg);
         responseData.setData(t);
@@ -58,7 +58,7 @@ public class ResponseData<T> implements Serializable {
         responseData.setCode(ERROR_CODE);
         return responseData;
     }
-    public static ResponseData ERROR(String msg){
+    public static ResponseData ERRORMSG(String msg){
         responseData.setCode(ERROR_CODE);
         responseData.setMsg(msg);
         return responseData;

@@ -17,19 +17,19 @@ public class MpCode {
         String packageName = "com.example.springboot.model";
         boolean serviceNameStartWithI = true;//user -> UserService, 设置成true: user -> IUserService
         //需要的表名，多个表名传数组
-        generateByTables(serviceNameStartWithI, packageName, "user_info");
+        generateByTables(serviceNameStartWithI, packageName, "cookies");
     }
 
 
     private void generateByTables(boolean serviceNameStartWithI, String packageName, String... tableNames) {
         String projectPath = System.getProperty("user.dir");
         GlobalConfig config = new GlobalConfig();
-        String dbUrl = "jdbc:mysql://localhost:3306/demo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT";
+        String dbUrl = "jdbc:mysql://rm-bp19266526199q43p9o.mysql.rds.aliyuncs.com:3306/hyd_put";
         DataSourceConfig dataSourceConfig = new DataSourceConfig();
         dataSourceConfig.setDbType(DbType.MYSQL)
                 .setUrl(dbUrl)
-                .setUsername("root")
-                .setPassword("root")
+                .setUsername("yycceg")
+                .setPassword("YYcceg!@#")
                 .setDriverName("com.mysql.jdbc.Driver");
         StrategyConfig strategyConfig = new StrategyConfig();
         strategyConfig

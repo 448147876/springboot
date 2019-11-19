@@ -6,6 +6,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -221,6 +224,10 @@ public class Customer implements Serializable {
 
     @ApiModelProperty(value = "到期提醒日期")
     private LocalDateTime reminderDate;
+
+    @ApiModelProperty(value = "用户表，包含多个用户")
+    @TableField(exist = false)
+    private List<Customeruser> customeruserList;
 
 
 }

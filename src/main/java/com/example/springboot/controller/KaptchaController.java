@@ -28,10 +28,10 @@ public class KaptchaController {
             if(null != code && !"".equals(code)){
                 return ResponseData.SUCCESS("验证渲染成功");
             }else{
-               return ResponseData.ERROR("验证渲染失败");
+               return ResponseData.ERRORMSG("验证渲染失败");
             }
         } catch (Exception e) {
-            return ResponseData.ERROR("验证渲染失败");
+            return ResponseData.ERRORMSG("验证渲染失败");
         }
     }
 
@@ -50,10 +50,10 @@ public class KaptchaController {
             if(kaptcha.validate(code)){
                 return  ResponseData.SUCCESS("验证成功");
             }else{
-                return ResponseData.ERROR("验证码有误");
+                return ResponseData.ERRORMSG("验证码有误");
             }
         } catch (Exception e) {
-            return ResponseData.ERROR("验证失败");
+            return ResponseData.ERRORMSG("验证失败");
         }
     }
 
