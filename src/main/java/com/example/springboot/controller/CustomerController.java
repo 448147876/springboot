@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.example.springboot.entity.*;
 import com.example.springboot.service.impl.*;
 import com.example.springboot.utils.HttpClientTool;
-import com.example.springboot.utils.HttpLogin;
 import com.example.springboot.utils.ResponseData;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +56,9 @@ public class CustomerController {
 
     @Autowired
     CookiesServiceImpl cookiesService;
+
+    @Autowired
+    DataFromAlibabaServiceImpl dataFromAlibabaService;
 
 
     /**
@@ -312,19 +314,20 @@ public class CustomerController {
             if (customerOld == null) {
                 continue;
             }
-            //工商信息处理
-            customerService.getBussinessInfo(customerOld, customerImportQsEach, jobId);
-            //联系人处理
-            customeruserService.handleContenct(customerImportQsEach, customerOld, jobId);
-            customerImportQsEach.setJobId(jobId);
-            customerImportQsService.updateById(customerImportQsEach);
-
+            try {
+                //工商信息处理
+                customerService.getBussinessInfo(customerOld, customerImportQsEach, jobId);
+                //联系人处理
+                customeruserService.handleContenct(customerImportQsEach, customerOld, jobId);
+                customerImportQsEach.setJobId(jobId);
+                customerImportQsService.updateById(customerImportQsEach);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return ResponseData.SUCCESSMSG("处理完成");
     }
-
-
 
 
     /**
@@ -344,7 +347,7 @@ public class CustomerController {
                 try {
                     String urlList = "https://www.qichacha.com/search?key=" + URLEncoder.encode(StringUtils.trim(name));
                     Thread.sleep(1000 * ((int) (40 + Math.random() * 10)));
-                    String infoList = HttpClientTool.doGet(urlList,listCookie1.get(0).getCookie());
+                    String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
                     Document doc = Jsoup.parse(infoList);
                     // 页面属性选择 通过key值取到select的内容
                     Elements links = doc.select("tbody>tr>td>a");
@@ -352,8 +355,8 @@ public class CustomerController {
                     String href = links.get(0).attr("href");
                     String dataUrl = "https://www.qichacha.com/" + href;
                     Thread.sleep(1000 * ((int) (50 + Math.random() * 10)));
-                    String dataInfo = HttpClientTool.doGet(dataUrl,listCookie2.get(0).getCookie());
-                    if(StringUtils.isNotBlank(dataInfo)){
+                    String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
+                    if (StringUtils.isNotBlank(dataInfo)) {
                         DataCrawler dataCrawler = new DataCrawler();
                         dataCrawler.setCreateTime(LocalDateTime.now());
                         dataCrawler.setName(name);
@@ -363,7 +366,7 @@ public class CustomerController {
                         count++;
                     }
                 } catch (Exception e) {
-                    System.out.println("**************************"+listCookie1.get(0).toString());
+                    System.out.println("**************************" + listCookie1.get(0).toString());
                     e.printStackTrace();
                 }
             }
@@ -382,7 +385,7 @@ public class CustomerController {
         try {
             String urlList = "https://www.qichacha.com/search?key=" + URLEncoder.encode(StringUtils.trim(name));
             Thread.sleep(1000 * ((int) (40 + Math.random() * 10)));
-            String infoList = HttpClientTool.doGet(urlList,listCookie1.get(0).getCookie());
+            String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
             Document doc = Jsoup.parse(infoList);
             // 页面属性选择 通过key值取到select的内容
             Elements links = doc.select("tbody>tr>td>a");
@@ -390,8 +393,8 @@ public class CustomerController {
             String href = links.get(0).attr("href");
             String dataUrl = "https://www.qichacha.com/" + href;
             Thread.sleep(1000 * ((int) (50 + Math.random() * 10)));
-            String dataInfo = HttpClientTool.doGet(dataUrl,listCookie2.get(0).getCookie());
-            if(StringUtils.isNotBlank(dataInfo)){
+            String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
+            if (StringUtils.isNotBlank(dataInfo)) {
                 DataCrawler dataCrawler = new DataCrawler();
                 dataCrawler.setCreateTime(LocalDateTime.now());
                 dataCrawler.setName(name);
@@ -401,7 +404,7 @@ public class CustomerController {
             }
             return ResponseData.SUCCESS(dataInfo);
         } catch (Exception e) {
-            System.out.println("**************************"+listCookie1.get(0).toString());
+            System.out.println("**************************" + listCookie1.get(0).toString());
             e.printStackTrace();
             return ResponseData.ERRORMSG(e.getMessage());
         }
@@ -410,34 +413,36 @@ public class CustomerController {
 
     /**
      * 从企查查上爬取数据
+     *
      * @param name
      * @return
      */
     @GetMapping("customerDataQccHandelOne")
     public ResponseData<Customer> customerDataQccHandelOne(String name) {
         QueryWrapper<DataCrawler> dataCrawlerQueryWrapper = new QueryWrapper<>();
-        dataCrawlerQueryWrapper.eq("source","企查查");
-        dataCrawlerQueryWrapper.eq("name",name);
+        dataCrawlerQueryWrapper.eq("source", "企查查");
+        dataCrawlerQueryWrapper.eq("name", name);
         DataCrawler one = dataCrawlerService.getOne(dataCrawlerQueryWrapper);
         String htmlStr = null;
-        if(one == null){
+        if (one == null) {
             ResponseData<String> responseData = this.customerDataQccOne(name);
             htmlStr = responseData.getData();
-        }else{
+        } else {
             htmlStr = one.getText();
         }
-        if(StringUtils.isBlank(htmlStr)){
+        if (StringUtils.isBlank(htmlStr)) {
             return ResponseData.ERRORMSG("企查查没有查询到该客户");
         }
 
-        ResponseData<Customer> responseData = customerService.handleDataByQcc(htmlStr,name);
-        if(responseData.getCode() == ResponseData.ERROR_CODE){
+        ResponseData<Customer> responseData = customerService.handleDataByQcc(htmlStr, name);
+        if (responseData.getCode() == ResponseData.ERROR_CODE) {
             return responseData;
         }
         return customerService.saveInfoToDb(responseData.getData());
 
 
     }
+
     @GetMapping("customerDatasqw")
     public void customerDatasqw() {
         int count = 0;
@@ -450,25 +455,25 @@ public class CustomerController {
                 try {
                     String urlList = "http://so.11467.com/cse/search?s=662286683871513660&ie=utf-8&q=" + URLEncoder.encode(StringUtils.trim(name));
                     Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
-                    String infoList = HttpClientTool.doGet(urlList,listCookie1.get(0).getCookie());
+                    String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
                     Document doc = Jsoup.parse(infoList);
                     // 页面属性选择 通过key值取到select的内容
                     Elements links = doc.select("#results>div>h3>a");
                     // 选取第一个元素就是要访问的公司信息
                     String href = null;
-                    for(Element element:links){
-                        if(StringUtils.equals(element.select("em").html().trim(),name)){
+                    for (Element element : links) {
+                        if (StringUtils.equals(element.select("em").html().trim(), name)) {
                             href = element.attr("href");
                             break;
                         }
                     }
-                    if(StringUtils.isBlank(href)){
+                    if (StringUtils.isBlank(href)) {
                         continue;
                     }
                     String dataUrl = href;
                     Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
-                    String dataInfo = HttpClientTool.doGet(dataUrl,listCookie2.get(0).getCookie());
-                    if(StringUtils.isNotBlank(dataInfo)){
+                    String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
+                    if (StringUtils.isNotBlank(dataInfo)) {
                         DataCrawler dataCrawler = new DataCrawler();
                         dataCrawler.setCreateTime(LocalDateTime.now());
                         dataCrawler.setName(name);
@@ -491,25 +496,25 @@ public class CustomerController {
         try {
             String urlList = "http://so.11467.com/cse/search?s=662286683871513660&ie=utf-8&q=" + URLEncoder.encode(StringUtils.trim(name));
             Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
-            String infoList = HttpClientTool.doGet(urlList,listCookie1.get(0).getCookie());
+            String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
             Document doc = Jsoup.parse(infoList);
             // 页面属性选择 通过key值取到select的内容
             Elements links = doc.select("#results>div>h3>a");
             // 选取第一个元素就是要访问的公司信息
             String href = null;
-            for(Element element:links){
-                if(StringUtils.equals(element.select("em").html().trim(),name)){
+            for (Element element : links) {
+                if (StringUtils.equals(element.select("em").html().trim(), name)) {
                     href = element.attr("href");
                     break;
                 }
             }
-            if(StringUtils.isBlank(href)){
+            if (StringUtils.isBlank(href)) {
                 return ResponseData.ERROR();
             }
             String dataUrl = href;
             Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
-            String dataInfo = HttpClientTool.doGet(dataUrl,listCookie2.get(0).getCookie());
-            if(StringUtils.isNotBlank(dataInfo)){
+            String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
+            if (StringUtils.isNotBlank(dataInfo)) {
                 DataCrawler dataCrawler = new DataCrawler();
                 dataCrawler.setCreateTime(LocalDateTime.now());
                 dataCrawler.setName(name);
@@ -532,6 +537,176 @@ public class CustomerController {
         return null;
     }
 
+
+    /**
+     * 从抓取的数据中获取数据
+     *
+     * @return
+     */
+    @GetMapping("customerDataQxb")
+    public void getDataFromQxb() {
+        int count = 0;
+        while (true) {
+            List<String> list = customerService.listOne("启信宝");
+            //循环处理
+            for (String name : list) {
+                List<Cookies> listCookie1 = cookiesService.selectCookieOne("启信宝");
+                List<Cookies> listCookie2 = cookiesService.selectCookieOne("启信宝");
+                try {
+                    String urlList = "https://www.qixin.com/search?from=baidusem8&page=1&key=" + URLEncoder.encode(StringUtils.trim(name));
+//                    Thread.sleep(1000 * ((int) (40 + Math.random() * 10)));
+                    String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
+                    Document doc = Jsoup.parse(infoList);
+                    // 页面属性选择 通过key值取到select的内容
+                    Elements links = doc.select("div[class=col-2-1]>div[class=company-title font-18 font-f1]>a");
+                    // 选取第一个元素就是要访问的公司信息
+                    String href = links.get(0).attr("href");
+                    String dataUrl = "https://www.qixin.com" + href;
+//                    Thread.sleep(1000 * ((int) (50 + Math.random() * 10)));
+                    String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
+                    if (StringUtils.isNotBlank(dataInfo)) {
+                        DataCrawler dataCrawler = new DataCrawler();
+                        dataCrawler.setCreateTime(LocalDateTime.now());
+                        dataCrawler.setName(name);
+                        dataCrawler.setText(dataInfo);
+                        dataCrawler.setSource("启信宝");
+                        dataCrawlerService.save(dataCrawler);
+                        count++;
+                    }
+                } catch (Exception e) {
+                    System.out.println("**************************" + listCookie1.get(0).toString());
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 从抓取的数据中获取数据
+     *
+     * @return
+     */
+    @GetMapping("customerDataTyc")
+    public void getDataFromTyc() {
+        int count = 0;
+        while (true) {
+            List<String> list = customerService.listOne("天眼查");
+            //循环处理
+            for (String name : list) {
+                List<Cookies> listCookie1 = cookiesService.selectCookieOne("天眼查");
+                List<Cookies> listCookie2 = cookiesService.selectCookieOne("天眼查");
+                try {
+                    String urlList = "https://www.tianyancha.com/search?key=" + URLEncoder.encode(StringUtils.trim(name));
+//                    Thread.sleep(1000 * ((int) (40 + Math.random() * 10)));
+                    String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
+                    Document doc = Jsoup.parse(infoList);
+                    // 页面属性选择 通过key值取到select的内容
+                    Elements links = doc.select("div[class=header]>a");
+                    // 选取第一个元素就是要访问的公司信息
+                    String href = links.get(0).attr("href");
+                    String dataUrl = href;
+//                    Thread.sleep(1000 * ((int) (50 + Math.random() * 10)));
+                    String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
+                    if (StringUtils.isNotBlank(dataInfo)) {
+                        DataCrawler dataCrawler = new DataCrawler();
+                        dataCrawler.setCreateTime(LocalDateTime.now());
+                        dataCrawler.setName(name);
+                        dataCrawler.setText(dataInfo);
+                        dataCrawler.setSource("天眼查");
+                        dataCrawlerService.save(dataCrawler);
+                        count++;
+                    }
+                } catch (Exception e) {
+                    System.out.println("**************************" + listCookie1.get(0).toString());
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
+    @GetMapping("startHandle11")
+    public ResponseData<Customer> startHandle(String name) {
+
+        ResponseData<Customer> cUstomerInfoQcc = customerService.getCUstomerInfoQcc(name);
+        ResponseData<Customer> cUstomerInfo2 = customerService.getCUstomerInfoSqw(name);
+
+        System.out.println(cUstomerInfoQcc.toString());
+        System.out.println(cUstomerInfo2.toString());
+
+        return ResponseData.ERROR();
+    }
+
+    @Autowired
+    DataFromBaiduServiceImpl dataFromBaiduService;
+
+    @GetMapping("startHandleQccSqwAll")
+    public void startHandleAll() {
+
+        List<Customer> customerList = customerService.selectNotInPoolCustomer();
+        for(Customer customer:customerList){
+            try {
+                //从企查查上获取
+                ResponseData<Customer> cUstomerInfoQcc = customerService.getCUstomerInfoQcc(customer.getName());
+                if (cUstomerInfoQcc.getCode() == ResponseData.SUCCESS_CODE) {
+                    customerService.getCUstomerInfoToDb(cUstomerInfoQcc.getData());
+                }
+
+
+                //从顺企网上获取
+                ResponseData<Customer> cUstomerInfo2 = customerService.getCUstomerInfoSqw(customer.getName());
+                if (cUstomerInfo2.getCode() == ResponseData.SUCCESS_CODE) {
+                    customerService.getCUstomerInfoToDb(cUstomerInfo2.getData());
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    @GetMapping("startHandleBaiduAlibabaAll")
+    public void startHandleBaiduAlibabaAll() {
+        List<Customer> list = customerService.list();
+        for(Customer customer:list){
+            try {
+
+                //从百度征信上获取
+                ResponseData<Customer> cUstomerInfoBaidu = dataFromBaiduService.getEntInfo(customer.getName());
+                if (cUstomerInfoBaidu.getCode() == ResponseData.SUCCESS_CODE) {
+                    Customer data = cUstomerInfoBaidu.getData();
+                    data.setCustomeruserList(null);
+                    customerService.getCUstomerInfoToDb(data);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+    @GetMapping("startHandleBaiduAlibabaAddress")
+    public void startHandleBaiduAlibabaAddress(String name) {
+//        ResponseData<Customer> cUstomerInfoBaidu = dataFromAlibabaService.getLocation(name);
+//        System.out.printf(cUstomerInfoBaidu.toString());
+        List<Customer> list = customerService.list();
+        for(Customer customer:list){
+            try {
+
+                ResponseData<Customer> cUstomerInfoBaidu = dataFromAlibabaService.getLocation(customer.getName());
+                if (cUstomerInfoBaidu.getCode() == ResponseData.SUCCESS_CODE) {
+                    Customer data = cUstomerInfoBaidu.getData();
+                    customerService.getCUstomerInfoToDb(data);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
 
 }
 

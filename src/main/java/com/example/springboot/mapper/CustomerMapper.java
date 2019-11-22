@@ -20,4 +20,26 @@ public interface CustomerMapper extends BaseMapper<Customer> {
 
     @Select("SELECT c.Name FROM customer c WHERE !EXISTS(SELECT 1 FROM data_crawler dc WHERE dc.name = c.Name AND dc.source = #{sourceName}) ORDER BY RAND() LIMIT 1")
     List<String> listOne(String sourceName);
+
+    @Select("        SELECT\n" +
+            "            c.ID AS id,\n" +
+            "            c.customer_code AS customerCode,\n" +
+            "            c.Name AS name,\n" +
+            "            c.AreaCode AS areaCode,\n" +
+            "            c.customer_type as customerType\n" +
+            "        FROM customer c\n" +
+            "          where\n" +
+            "                (!EXISTS(SELECT cyy.id FROM customerhw_year_yield cyy WHERE cyy.customer_id = c.id AND cyy.hw_code IS NOT null))\n" +
+            "                OR (!EXISTS(SELECT cu.id FROM customeruser cu WHERE cu.CustomerID = c.id  AND ((cu.MobilePhone IS NOT NULL AND TRIM(cu.MobilePhone)   <>  '')) OR (cu.phone IS NOT NULL AND TRIM(cu.phone)  <>  '')))\n" +
+            "                OR (c.Address IS  NULL OR TRIM(c.Address) = '')\n" +
+            "                OR (c.CompanyDescript IS  NULL OR TRIM(c.CompanyDescript) = '')\n" +
+            "                OR (c.CreateTime IS  NULL OR TRIM(c.CreateTime) = '')\n" +
+            "                OR (c.AreaCode IS  NULL OR TRIM(c.AreaCode) = '')\n" +
+            "                OR (c.MainProducts IS   NULL OR TRIM(c.MainProducts) = '')\n" +
+            "                OR (c.BusinessIndustry IS  NULL OR TRIM(c.BusinessIndustry) ='')\n" +
+            "                OR (c.RegisteredCapital IS  NULL OR TRIM(c.RegisteredCapital) = '')\n" +
+            "                OR (c.LegalRepresentative IS  NULL OR TRIM(c.LegalRepresentative) = '')\n" +
+            "        GROUP BY c.ID\n" +
+            "    ")
+    List<Customer> selectNotInPoolCustomer();
 }

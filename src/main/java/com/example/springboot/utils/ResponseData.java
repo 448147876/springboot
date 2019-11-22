@@ -1,5 +1,7 @@
 package com.example.springboot.utils;
 
+import lombok.ToString;
+
 import java.io.Serializable;
 
 /**
@@ -8,10 +10,9 @@ import java.io.Serializable;
   * @Date: 2019/3/28
   * @version :
   */
-
+@ToString
 public class ResponseData<T> implements Serializable {
 
-    private final static ResponseData responseData = new ResponseData();
 
     public static int SUCCESS_CODE= Constants.httpState.SUCCESS.getCode();
     public static int ERROR_CODE = Constants.httpState.ERROR.getCode();
@@ -22,11 +23,13 @@ public class ResponseData<T> implements Serializable {
 
 
     public static ResponseData RESPONSE(Constants.httpState menuState){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(menuState.getCode());
         responseData.setMsg(menuState.getMsg());
         return responseData;
     }
     public static<T> ResponseData RESPONSE(Constants.httpState menuState,T t){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(menuState.getCode());
         responseData.setMsg(menuState.getMsg());
         responseData.setData(t);
@@ -35,55 +38,66 @@ public class ResponseData<T> implements Serializable {
 
 
     public static ResponseData SUCCESS(){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(SUCCESS_CODE);
         return responseData;
     }
     public static ResponseData SUCCESSMSG(String msg){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(SUCCESS_CODE);
         responseData.setMsg(msg);
         return responseData;
     }
     public static<T> ResponseData SUCCESS(T data){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(SUCCESS_CODE);
         responseData.setData(data);
         return responseData;
     }
     public static<T> ResponseData SUCCESS(T t, String msg){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(SUCCESS_CODE);
         responseData.setMsg(msg);
         responseData.setData(t);
         return responseData;
     }
     public static ResponseData ERROR(){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(ERROR_CODE);
         return responseData;
     }
     public static ResponseData ERRORMSG(String msg){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(ERROR_CODE);
         responseData.setMsg(msg);
         return responseData;
     }
     public static<T> ResponseData ERROR(T t,String msg){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(ERROR_CODE);
         responseData.setMsg(msg);
         responseData.setData(t);
         return responseData;
     }
     public static ResponseData ERROR(String msg,int code){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(code);
         responseData.setMsg(msg);
         return responseData;
     }
     public static ResponseData ERROR(int code){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(code);
         return responseData;
     }
     public static ResponseData ERROR(int code,String msg){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(code);
         responseData.setMsg(msg);
         return responseData;
     }
     public static<T> ResponseData ERROR(int code,T t,String msg){
+        ResponseData responseData = new ResponseData();
         responseData.setCode(code);
         responseData.setMsg(msg);
         responseData.setData(t);

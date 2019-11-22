@@ -133,7 +133,7 @@ public class Customeruser implements Serializable {
     private String taste;
 
     @ApiModelProperty(value = "是否有效")
-    private Integer delFlag;
+    private Boolean delFlag;
 
     @ApiModelProperty(value = "备注")
     private String remarks;

@@ -26,4 +26,7 @@ public interface ICustomerService extends IService<Customer> {
     ResponseData<Customer> handleDataByQcc(String htmlStr,String name);
 
     ResponseData<Customer> saveInfoToDb(Customer customer);
+
+    List<Customer> selectNotInPoolCustomer();
+
 }

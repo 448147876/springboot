@@ -1,6 +1,7 @@
 package com.example.springboot.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.springboot.entity.Customer;
 import com.example.springboot.entity.CustomerImportQs;
@@ -8,6 +9,7 @@ import com.example.springboot.entity.Customeruser;
 import com.example.springboot.mapper.CustomerMapper;
 import com.example.springboot.service.ICustomerService;
 import com.example.springboot.utils.ResponseData;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,6 +18,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -35,6 +38,12 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
 
     @Autowired
     CustomeruserServiceImpl customeruserService;
+
+    @Autowired
+    CustomerImportQsServiceImpl customerImportQsService;
+
+    @Autowired
+    CustomerServiceImpl customerService;
 
 
     /**
@@ -133,17 +142,18 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
 
     /**
      * 从企查查上爬取数据
+     *
      * @param htmlStr
      * @return
      */
     @Override
-    public ResponseData<Customer> handleDataByQcc(String htmlStr,String name) {
+    public ResponseData<Customer> handleDataByQcc(String htmlStr, String name) {
         Customer customer = new Customer();
         customer.setName(name);
         Document doc = Jsoup.parse(htmlStr);
         //企业基本信息
         Elements elements = doc.select("#Cominfo>table>tbody>tr");
-        if(elements == null || elements.isEmpty()){
+        if (elements == null || elements.isEmpty()) {
             return ResponseData.ERRORMSG("抓取到");
         }
         //法定代表人和注册资金
@@ -151,16 +161,16 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         Elements tds0 = element0.select("td");
         customer.setLegalRepresentative(tds0.get(1).select("a>h2").html());
         String registeredCapitalStr = tds0.get(3).html();
-        if(StringUtils.equals(registeredCapitalStr,"-")){
+        if (StringUtils.equals(registeredCapitalStr, "-")) {
             customer.setRegisteredCapital(0);
-        }else if(StringUtils.contains(registeredCapitalStr,'.')){
-            registeredCapitalStr = StringUtils.substringBefore(registeredCapitalStr,".");
-            if(StringUtils.isNumeric(registeredCapitalStr)){
+        } else if (StringUtils.contains(registeredCapitalStr, '.')) {
+            registeredCapitalStr = StringUtils.substringBefore(registeredCapitalStr, ".");
+            if (StringUtils.isNumeric(registeredCapitalStr)) {
                 customer.setRegisteredCapital(Integer.parseInt(registeredCapitalStr));
             }
-        }else{
-            registeredCapitalStr = StringUtils.substringBefore(registeredCapitalStr,"万");
-            if(StringUtils.isNumeric(registeredCapitalStr)){
+        } else {
+            registeredCapitalStr = StringUtils.substringBefore(registeredCapitalStr, "万");
+            if (StringUtils.isNumeric(registeredCapitalStr)) {
                 customer.setRegisteredCapital(Integer.parseInt(registeredCapitalStr));
             }
         }
@@ -169,19 +179,19 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         Element element2 = elements.get(2);
         Elements tds2 = element2.select("td");
         String createTime = tds2.get(3).html();
-        if(StringUtils.equals(registeredCapitalStr,"-")){
+        if (StringUtils.equals(registeredCapitalStr, "-")) {
             customer.setCreateTime("1970-01-01");
-        }else{
-            createTime = StringUtils.replace(createTime,"年","-");
-            createTime = StringUtils.replace(createTime,"月","-");
-            createTime = StringUtils.replace(createTime,"日","-");
+        } else {
+            createTime = StringUtils.replace(createTime, "年", "-");
+            createTime = StringUtils.replace(createTime, "月", "-");
+            createTime = StringUtils.replace(createTime, "日", "-");
             customer.setCreateTime(createTime);
         }
         //统一社会信用代码
         Element element3 = elements.get(3);
         Elements tds3 = element3.select("td");
         String organizationCodeStr = tds3.get(1).html();
-        if(StringUtils.isNotBlank(organizationCodeStr)){
+        if (StringUtils.isNotBlank(organizationCodeStr)) {
             customer.setOrganizationCode(organizationCodeStr);
         }
 
@@ -189,7 +199,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         Element element5 = elements.get(5);
         Elements tds5 = element5.select("td");
         String businessIndustry = tds5.get(3).html();
-        if(StringUtils.isNotBlank(businessIndustry)){
+        if (StringUtils.isNotBlank(businessIndustry)) {
             customer.setBusinessIndustry(businessIndustry);
         }
 
@@ -197,21 +207,21 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         Element element9 = elements.get(9);
         Elements tds9 = element9.select("td");
         String StaffSize = tds9.get(1).html();
-        if(StringUtils.isNotBlank(StaffSize)){
+        if (StringUtils.isNotBlank(StaffSize)) {
             customer.setStaffSize(StaffSize);
         }
         //公司地址.text()
         Element element10 = elements.get(10);
         Elements tds10 = element10.select("td");
         String address = tds10.get(1).text();
-        if(StringUtils.isNotBlank(address)){
+        if (StringUtils.isNotBlank(address)) {
             customer.setStaffSize(address);
         }
         //公司地址
         Element element11 = elements.get(11);
         Elements tds11 = element11.select("td");
         String mainProducts = tds11.get(1).html();
-        if(StringUtils.isNotBlank(mainProducts)){
+        if (StringUtils.isNotBlank(mainProducts)) {
             customer.setMainProducts(mainProducts);
         }
 //        联系人信息
@@ -220,25 +230,25 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         //电话和官网
         Element elements0 = elementPsns.get(0);
         Elements spansPhone = elements0.select("span[class=fc]>span[class=cvlu]>a");
-        if(spansPhone !=null  && !spansPhone.isEmpty()){
+        if (spansPhone != null && !spansPhone.isEmpty()) {
             String phone = spansPhone.get(0).html();
-            if(StringUtils.startsWith(phone,"1") || StringUtils.startsWith(phone,"+") || StringUtils.startsWith(phone,"86")){
+            if (StringUtils.startsWith(phone, "1") || StringUtils.startsWith(phone, "+") || StringUtils.startsWith(phone, "86")) {
                 customeruser.setMobilePhone(phone);
-            }else{
+            } else {
                 customeruser.setPhone(phone);
             }
         }
         Elements spansWebs = elements0.select("span[class=cvlu] >a");
-        if(spansWebs !=null  && !spansWebs.isEmpty()){
+        if (spansWebs != null && !spansWebs.isEmpty()) {
             String spansWeb = spansWebs.get(2).html();
-            if(StringUtils.isNotBlank(spansWeb) ){
+            if (StringUtils.isNotBlank(spansWeb)) {
                 customer.setWebSite(spansWeb);
             }
         }
         //邮箱
         Element emails = elementPsns.get(1);
         String email = emails.select("span[class=fc] >span[class=cvlu]>a").get(0).text();
-        if(StringUtils.isNotBlank(email)){
+        if (StringUtils.isNotBlank(email)) {
             customeruser.setEmail(email);
         }
         customeruser.setRealName("法人");
@@ -304,7 +314,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         for (Customeruser customeruser : customeruserList) {
             int i = 0;
             for (Customeruser customeruserOld : customeruserListOld) {
-                if(StringUtils.equals(customeruserOld.getMobilePhone(),customeruser.getMobilePhone())){
+                if (StringUtils.equals(customeruserOld.getMobilePhone(), customeruser.getMobilePhone())) {
                     i++;
                     if (StringUtils.isBlank(customeruserOld.getRealName()) && StringUtils.isNotBlank(customeruser.getRealName())) {
                         customeruserOld.setRealName(customeruser.getRealName());
@@ -324,9 +334,9 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
                     customeruserService.updateById(customeruserOld);
                 }
             }
-            if(i == 0){
+            if (i == 0) {
                 customeruser.setCustomerID(customerOld.getId());
-                customeruser.setDelFlag(1);
+                customeruser.setDelFlag(true);
                 customeruser.setRemarks("处理");
                 customeruserService.save(customeruser);
             }
@@ -334,6 +344,8 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
 
         return ResponseData.SUCCESS();
     }
+
+
 
 
     //type=1:地址,type=2:座机,type=3:职位，type=4:姓名，type=5:手机，type=6:邮箱，type=7：qq
@@ -608,4 +620,324 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
 
         return null;
     }
+
+
+    //根据企业名字组装客户信息
+    public ResponseData<Customer> getCUstomerInfoQcc(String name) {
+        List<Customeruser> customeruserList = Lists.newLinkedList();
+        Customer customer = new Customer();
+        customer.setName(name);
+        QueryWrapper<CustomerImportQs> qsQueryWrapper = new QueryWrapper<>();
+         qsQueryWrapper.eq("source_Type", "企查查");
+        qsQueryWrapper.eq("enterprise_Name", name);
+        List<CustomerImportQs> list = customerImportQsService.list(qsQueryWrapper);
+        if (list == null || list.isEmpty()) {
+            return ResponseData.ERRORMSG("企查查没有改企业信息：" + name);
+        }
+        CustomerImportQs customerImportQs = list.get(0);
+        String businessInfoHtml = customerImportQs.getBusinessInfoHtml();
+        Document documentBusiness = Jsoup.parse(businessInfoHtml);
+        Elements elementsBusinessList = documentBusiness.select("tbody>tr");
+        //法定代表人和注册资金
+        Element element = elementsBusinessList.get(0);
+        String businessPsnH2 = element.select("h2").get(0).text();
+        if (StringUtils.isNotBlank(businessPsnH2)) {
+            customer.setLegalRepresentative(businessPsnH2);
+        }
+        String businessPsnca = element.select("td").get(3).text();
+        if (StringUtils.isNotBlank(businessPsnca)) {
+            if (StringUtils.contains(businessPsnca, ".")) {
+                Integer i = Integer.parseInt(StringUtils.substringBefore(businessPsnca, "."));
+                customer.setRegisteredCapital(i);
+            } else if (StringUtils.contains(businessPsnca, "万")) {
+                Integer i = Integer.parseInt(StringUtils.substringBefore(businessPsnca, "万"));
+                customer.setRegisteredCapital(i);
+            } else if (StringUtils.contains(businessPsnca, "-")) {
+                customer.setRegisteredCapital(0);
+            }
+        }
+        //成立时间
+        element = elementsBusinessList.get(2);
+        String text = element.select("td").get(3).text();
+        if (StringUtils.isNotBlank(text)) {
+            customer.setCreateTime(text);
+        }
+        //统一征信代码
+        element = elementsBusinessList.get(3);
+        text = element.select("td").get(1).text();
+        if (StringUtils.isNotBlank(text)) {
+            customer.setOrganizationCode(text);
+        }
+        //所属行业
+        element = elementsBusinessList.get(5);
+        text = element.select("td").get(3).text();
+        if (StringUtils.isNotBlank(text)) {
+            customer.setBusinessIndustry(text);
+        }
+        //人员规模
+        element = elementsBusinessList.get(9);
+        text = element.select("td").get(1).text();
+        if (StringUtils.isNotBlank(text)) {
+            customer.setStaffSize(text);
+        }
+        //企业地址
+        element = elementsBusinessList.get(10);
+        text = element.select("td").get(1).text();
+        if (StringUtils.isNotBlank(text)) {
+            customer.setAddress(text);
+        }
+        //经营范围
+        element = elementsBusinessList.get(11);
+        text = element.select("td").get(1).text();
+        if (StringUtils.isNotBlank(text)) {
+            customer.setMainProducts(text);
+        }
+        //获取人员信息
+        Document documentContent = Jsoup.parse(customerImportQs.getContantHtml());
+        Elements selectContents = documentContent.select("body>div>div");
+        Customeruser customeruser = new Customeruser();
+        //电话官网
+        element = selectContents.get(0);
+        text = element.select(">span>span").get(1).text();
+        if (StringUtils.isNotBlank(text)) {
+            customeruser.setPhone(text);
+        }
+        text = element.select(">span").get(2).text();
+        if (StringUtils.isNotBlank(text)) {
+            customer.setWebSite(text);
+        }
+        //邮箱地址
+        element = selectContents.get(1);
+        text = element.select(">span>span").get(1).text();
+        if (StringUtils.isNotBlank(text)) {
+            customeruser.setEmail(text);
+        }
+        if (StringUtils.isBlank(customer.getAddress())) {
+            text = element.select(">span").get(2).text();
+            if (StringUtils.isNotBlank(text)) {
+                customer.setAddress(text);
+            }
+        }
+        if (StringUtils.isBlank(customeruser.getRealName())) {
+            customeruser.setRealName("法人");
+        }
+        customeruserList.add(customeruser);
+        customer.setCustomeruserList(customeruserList);
+        return ResponseData.SUCCESS(customer);
+    }
+
+    //根据企业名字组装客户信息
+    public ResponseData<Customer> getCUstomerInfoSqw(String name) {
+        List<Customeruser> customeruserList = Lists.newLinkedList();
+        Customer customer = new Customer();
+        //获取顺企网
+        customer.setName(name);
+        QueryWrapper<CustomerImportQs> qsQueryWrapper = new QueryWrapper<>();
+        qsQueryWrapper.eq("enterprise_Name", name);
+        qsQueryWrapper.eq("source_Type", "顺企网");
+
+        List<CustomerImportQs> list = customerImportQsService.list(qsQueryWrapper);
+        if (list == null || list.isEmpty()) {
+            return ResponseData.ERRORMSG("顺企网没有该企业数据");
+        }
+        CustomerImportQs customerImportQs = list.get(0);
+        String businessInfoHtml = customerImportQs.getBusinessInfoHtml();
+        Document documentBusiness = Jsoup.parse(businessInfoHtml);
+        Elements elementsBusinessList = documentBusiness.select("table>tbody>tr");
+
+        for (Element elementEach : elementsBusinessList) {
+            Elements select = elementEach.select("tr>td");
+            String text1 = select.get(0).text();
+            if (StringUtils.contains(text1, "主要经营产品") && StringUtils.isNotBlank(select.get(1).text())) {
+                customer.setMainProducts(select.get(1).text());
+            }
+            if (StringUtils.contains(text1, "成立时间") && StringUtils.isNotBlank(select.get(1).text())) {
+                text1 = StringUtils.replace(select.get(1).text(), "年", "-");
+                text1 = StringUtils.replace(text1, "月", "-");
+                text1 = StringUtils.replace(text1, "日", "-");
+                customer.setCreateTime(text1);
+            }
+            if (StringUtils.contains(text1, "注册资本") && StringUtils.isNotBlank(select.get(1).text())) {
+                text1 = select.get(1).text();
+                text1 =StringUtils.replace(text1,"(","");
+                text1 =StringUtils.replace(text1,")","");
+                text1 =StringUtils.replace(text1,"-","");
+                text1 =StringUtils.replace(text1,"_","");
+                text1 =StringUtils.replace(text1,":","");
+                text1 =StringUtils.replace(text1," ","");
+                if (StringUtils.contains(text1, ".")) {
+                    int i = Integer.parseInt(StringUtils.substringBefore(text1, "."));
+                    customer.setRegisteredCapital(i);
+                } else if (StringUtils.contains(text1, "万")) {
+                    int i = Integer.parseInt(StringUtils.substringBefore(text1, "万"));
+                    customer.setRegisteredCapital(i);
+                }
+            }
+            if (StringUtils.contains(text1, "所属分类") && StringUtils.isNotBlank(select.get(1).text())) {
+                customer.setCreateTime(select.get(1).text());
+            }
+        }
+
+
+        Customeruser customeruser = new Customeruser();
+        Document documentContent = Jsoup.parse(customerImportQs.getContantHtml());
+
+        Elements dt = documentContent.select("body>div>div>dl>dt");
+        Elements dd = documentContent.select("body>div>div>dl>dd");
+        int i = 0;
+        for (Element dtEach : dt) {
+            String textDt = dtEach.text();
+            String textDd = dd.get(i).text();
+            if (StringUtils.contains(textDt, "地址")) {
+                if (StringUtils.isNotBlank(textDd) && StringUtils.isBlank(customer.getAddress())) {
+                    customer.setAddress(textDd);
+                }
+            }
+            if (StringUtils.contains(textDt, "电话")) {
+                if (StringUtils.isNotBlank(textDd) ) {
+                    customeruser.setPhone(textDd);
+                }
+            }
+            if (StringUtils.contains(textDt, "手机")) {
+                if (StringUtils.isNotBlank(textDd)) {
+                    customeruser.setMobilePhone(textDd);
+                }
+            }
+            if (StringUtils.contains(textDt, "厂长") || StringUtils.contains(textDt, "经理")) {
+                customeruser.setPosition(textDt);
+                if (StringUtils.isNotBlank(textDd)) {
+                    customeruser.setRealName(textDd);
+                }
+            }
+            if (StringUtils.contains(textDt, "邮箱") ) {
+                if (StringUtils.isNotBlank(textDd)) {
+                    customeruser.setEmail(textDd);
+                }
+            }
+            if (StringUtils.contains(textDt, "QQ") ) {
+                if (StringUtils.isNotBlank(textDd)) {
+                    customeruser.setEmail(textDd);
+                }
+            }
+            i++;
+        }
+
+
+        customeruserList.add(customeruser);
+        customer.setCustomeruserList(customeruserList);
+        return ResponseData.SUCCESS(customer);
+    }
+
+
+
+    //保存数据到数据库
+    public ResponseData getCUstomerInfoToDb(Customer customer) {
+
+        QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("name",customer.getName());
+        List<Customer> list = customerService.list(queryWrapper);
+        if(list == null || list.isEmpty()){
+            return ResponseData.ERRORMSG("客户不存在"+customer.getName());
+        }
+        Customer customerOld = list.get(0);
+        if(StringUtils.isBlank(customerOld.getAddress()) && StringUtils.isNotBlank(customer.getAddress())){
+            customerOld.setAddress(customer.getAddress());
+        }
+        if(StringUtils.isBlank(customerOld.getCompanyDescript()) && StringUtils.isNotBlank(customer.getCompanyDescript())){
+            customerOld.setCompanyDescript(customer.getCompanyDescript());
+        }
+        if(StringUtils.isBlank(customerOld.getCreateTime()) && StringUtils.isNotBlank(customer.getCreateTime())){
+            customerOld.setCreateTime(customer.getCreateTime());
+        }
+        if(StringUtils.isBlank(customerOld.getMainProducts()) && StringUtils.isNotBlank(customer.getMainProducts())){
+            customerOld.setMainProducts(customer.getMainProducts());
+        }
+        if(StringUtils.isBlank(customerOld.getBusinessIndustry()) && StringUtils.isNotBlank(customer.getBusinessIndustry())){
+            customerOld.setBusinessIndustry(customer.getBusinessIndustry());
+        }
+        if(customerOld.getRegisteredCapital()== null && customer.getRegisteredCapital() !=null){
+            customerOld.setRegisteredCapital(customer.getRegisteredCapital());
+        }
+        if(StringUtils.isBlank(customerOld.getLegalRepresentative()) && StringUtils.isNotBlank(customer.getLegalRepresentative())){
+            customerOld.setLegalRepresentative(customer.getLegalRepresentative());
+        }
+        if(customerOld.getXSide() == null && customer.getXSide() != null){
+            customerOld.setXSide(customer.getXSide());
+        }
+        if(customerOld.getYSide() == null && customer.getYSide() != null){
+            customerOld.setYSide(customer.getYSide());
+        }
+        if(StringUtils.equals(customerOld.getAreaCode(),customer.getAreaCode()) ){
+            customerOld.setAreaCode(customer.getAreaCode());
+        }
+        if(customerOld.getAddress()== null && customer.getAddress() !=null){
+            customerOld.setAddress(customer.getAddress());
+        }
+        customerService.updateById(customerOld);
+        QueryWrapper<Customeruser> customeruserQueryWrapper = new QueryWrapper<>();
+        customeruserQueryWrapper.eq("CustomerID",customerOld.getId());
+        customeruserQueryWrapper.eq("del_flag",true);
+        List<Customeruser> customeruserListOld = customeruserService.list(customeruserQueryWrapper);
+        List<Customeruser> customeruserList = customer.getCustomeruserList();
+        if(customeruserList == null || customeruserList.isEmpty()){
+            return ResponseData.SUCCESS();
+        }
+        Customeruser customeruser = customeruserList.get(0);
+        if(customeruserListOld == null || customeruserListOld.isEmpty()){
+            //保存
+            customeruser.setCustomerID(customerOld.getId());
+            customeruser.setDelFlag(true);
+            customeruser.setAddTime(LocalDateTime.now());
+            customeruserService.save(customeruser);
+        }else{
+            int i = 0;
+            for(Customeruser customeruserOld:customeruserListOld){
+                if(StringUtils.equals(customeruser.getMobilePhone(),customeruserOld.getMobilePhone()) || StringUtils.equals(customeruser.getPhone(),customeruserOld.getPhone())) {
+                    if(StringUtils.isBlank(customeruserOld.getMobilePhone()) &&StringUtils.isNotBlank(customeruser.getMobilePhone())  ){
+                        customeruserOld.setMobilePhone(customeruser.getMobilePhone());
+                        i++;
+                    }
+                    if(StringUtils.isBlank(customeruserOld.getRealName()) &&StringUtils.isNotBlank(customeruser.getRealName())  ){
+                        customeruserOld.setRealName(customeruser.getRealName());
+                        i++;
+                    }
+                    if(StringUtils.isBlank(customeruserOld.getRealName()) &&StringUtils.isNotBlank(customeruser.getRealName())  ){
+                        customeruserOld.setRealName(customeruser.getRealName());
+                        i++;
+                    }
+                    if(StringUtils.isBlank(customeruserOld.getPosition()) &&StringUtils.isNotBlank(customeruser.getPosition())  ){
+                        customeruserOld.setPosition(customeruser.getPosition());
+                        i++;
+                    }
+                    if(StringUtils.isBlank(customeruserOld.getEmail()) &&StringUtils.isNotBlank(customeruser.getEmail())  ){
+                        customeruserOld.setEmail(customeruser.getEmail());
+                        i++;
+                    }
+                    if(StringUtils.isBlank(customeruserOld.getQq()) &&StringUtils.isNotBlank(customeruser.getQq())  ){
+                        customeruserOld.setQq(customeruser.getQq());
+                        i++;
+                    }
+                }
+                if(i == 0){
+                    customeruser.setCustomerID(customerOld.getId());
+                    customeruser.setDelFlag(true);
+                    customeruser.setAddTime(LocalDateTime.now());
+                    customeruserService.save(customeruser);
+                }else{
+                    customeruserService.updateById(customeruserOld);
+                }
+            }
+
+        }
+
+
+
+        return ResponseData.SUCCESS(customer);
+    }
+
+    @Override
+    public List<Customer> selectNotInPoolCustomer() {
+        return getBaseMapper().selectNotInPoolCustomer();
+    }
+
 }
