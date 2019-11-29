@@ -32,7 +32,7 @@ public class DataFromBaiduServiceImpl implements IDataFromBaiduService {
         customer.setName(name);
         String url = BAIDU_ENT_URL+name;
         try {
-            Thread.sleep(1000 * ((int) (10 + Math.random() * 5)));
+            Thread.sleep(1000 * ((int) (5 + Math.random() * 3)));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class DataFromBaiduServiceImpl implements IDataFromBaiduService {
             return ResponseData.ERRORMSG("没有查询到:"+name+";");
         }
         try {
-            Thread.sleep(1000 * ((int) (10 + Math.random() * 5)));
+            Thread.sleep(1000 * ((int) (5 + Math.random() * 3)));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

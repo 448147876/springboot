@@ -212,7 +212,7 @@ public class DataFromAlibabaServiceImpl implements IDataFromAlibabaService {
         search = StringUtils.replace(search, "（", "(");
         search = StringUtils.replace(search, "）", ")");
         search = StringUtils.lowerCase(search);
-        if(!StringUtils.equals(replace,search)){
+        if(!StringUtils.contains(search,replace)){
             return customer;
         }
         String location = poi.getLocation();

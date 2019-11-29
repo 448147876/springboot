@@ -668,8 +668,15 @@ public class CustomerController {
     }
 
     @GetMapping("startHandleBaiduAlibabaAll")
-    public void startHandleBaiduAlibabaAll() {
-        List<Customer> list = customerService.list();
+    public void startHandleBaiduAlibabaAll(String name) {
+        QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
+        if(StringUtils.isNotBlank(name)){
+            queryWrapper.eq("name",name);
+        }else{
+            queryWrapper.eq("SourceType",104009);
+            queryWrapper.isNull("OrganizationCode");
+        }
+        List<Customer> list = customerService.list(queryWrapper);
         for(Customer customer:list){
             try {
 
@@ -677,7 +684,7 @@ public class CustomerController {
                 ResponseData<Customer> cUstomerInfoBaidu = dataFromBaiduService.getEntInfo(customer.getName());
                 if (cUstomerInfoBaidu.getCode() == ResponseData.SUCCESS_CODE) {
                     Customer data = cUstomerInfoBaidu.getData();
-                    data.setCustomeruserList(null);
+//                    data.setCustomeruserList(null);
                     customerService.getCUstomerInfoToDb(data);
                 }
 
@@ -685,13 +692,17 @@ public class CustomerController {
                 e.printStackTrace();
             }
         }
+//        this.startHandleBaiduAlibabaAddress("sss");
 
     }
     @GetMapping("startHandleBaiduAlibabaAddress")
     public void startHandleBaiduAlibabaAddress(String name) {
 //        ResponseData<Customer> cUstomerInfoBaidu = dataFromAlibabaService.getLocation(name);
 //        System.out.printf(cUstomerInfoBaidu.toString());
-        List<Customer> list = customerService.list();
+        QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("SourceType",104009);
+        queryWrapper.isNull("OrganizationCode");
+        List<Customer> list = customerService.list(queryWrapper);
         for(Customer customer:list){
             try {
 

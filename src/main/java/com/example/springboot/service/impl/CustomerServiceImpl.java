@@ -873,6 +873,9 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         if(customerOld.getAddress()== null && customer.getAddress() !=null){
             customerOld.setAddress(customer.getAddress());
         }
+        if(customerOld.getOrganizationCode()== null && customer.getOrganizationCode() !=null){
+            customerOld.setOrganizationCode(customer.getOrganizationCode());
+        }
         customerService.updateById(customerOld);
         QueryWrapper<Customeruser> customeruserQueryWrapper = new QueryWrapper<>();
         customeruserQueryWrapper.eq("CustomerID",customerOld.getId());
