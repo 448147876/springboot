@@ -29,4 +29,5 @@ public interface ICustomerService extends IService<Customer> {
 
     List<Customer> selectNotInPoolCustomer();
 
+    List<Customer> selectAllNotPool();
 }

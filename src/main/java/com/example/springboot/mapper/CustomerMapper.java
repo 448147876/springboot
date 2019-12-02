@@ -42,4 +42,6 @@ public interface CustomerMapper extends BaseMapper<Customer> {
             "        GROUP BY c.ID\n" +
             "    ")
     List<Customer> selectNotInPoolCustomer();
+
+    List<Customer> selectAllNotPool();
 }

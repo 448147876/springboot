@@ -87,5 +87,27 @@
 
 
     </select>
+    <select id="selectAllNotPool" resultType="com.example.springboot.entity.Customer">
+        SELECT
+        c.Name AS name
+        FROM customer c
+        WHERE 1=1
+        AND (EXISTS(SELECT cyy.id FROM customerhw_year_yield cyy WHERE cyy.customer_id = c.id AND cyy.hw_code IS NOT null))
+        AND
+        (
+
+        (!EXISTS(SELECT cu.id FROM customeruser cu WHERE cu.CustomerID = c.id AND cu.RealName IS NOT NULL AND ((cu.MobilePhone IS NOT NULL AND TRIM(cu.MobilePhone)  <![CDATA[ <> ]]> '')) OR (cu.phone IS NOT NULL AND TRIM(cu.phone) <![CDATA[  <>  ]]>'')))
+        OR (c.Address IS  NULL OR TRIM(c.Address) = '')
+        OR (c.CompanyDescript IS  NULL OR TRIM(c.CompanyDescript) = '')
+        OR (c.CreateTime IS  NULL OR TRIM(c.CreateTime) = '')
+        OR (c.AreaCode IS  NULL OR TRIM(c.AreaCode) = '')
+        OR (c.MainProducts IS   NULL OR TRIM(c.MainProducts) = '')
+        OR (c.BusinessIndustry IS  NULL OR TRIM(c.BusinessIndustry) ='')
+        OR (c.RegisteredCapital IS  NULL OR TRIM(c.RegisteredCapital) = '')
+        OR (c.LegalRepresentative IS  NULL OR TRIM(c.LegalRepresentative) = '')
+        )
+        GROUP BY c.ID
+        ORDER BY RAND() LIMIT 1
+    </select>
 
 </mapper>

@@ -3,9 +3,11 @@ package com.example.springboot.service.impl;
 import com.example.springboot.entity.Customer;
 import com.example.springboot.entity.Customeruser;
 import com.example.springboot.service.IDataFromBaiduService;
+import com.example.springboot.utils.DateUtil;
 import com.example.springboot.utils.ResponseData;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,7 +35,7 @@ public class DataFromBaiduServiceImpl implements IDataFromBaiduService {
         customer.setName(name);
         String url = BAIDU_ENT_URL+name;
         try {
-            Thread.sleep(1000 * ((int) (5 + Math.random() * 3)));
+            Thread.sleep(1000 * ((int) (5 + Math.random() * 8)));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -54,7 +57,7 @@ public class DataFromBaiduServiceImpl implements IDataFromBaiduService {
             return ResponseData.ERRORMSG("没有查询到:"+name+";");
         }
         try {
-            Thread.sleep(1000 * ((int) (5 + Math.random() * 3)));
+            Thread.sleep(1000 * ((int) (4 + Math.random() * 7)));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -98,7 +101,18 @@ public class DataFromBaiduServiceImpl implements IDataFromBaiduService {
             //	成立日期
             td = selectBussiness.get(5).select("td").get(3).text();
             if(StringUtils.isNotBlank(td) && !StringUtils.equals(td,"-")){
-                customer.setCreateTime(td);
+                Date date = null;
+                try{
+                    if(StringUtils.contains(td,"-")){
+                        date = DateUtils.parseDate(td, DateUtil.yyyy_MM_dd_EN);
+                    }
+                    if(StringUtils.contains(td,"年")){
+                        date = DateUtils.parseDate(td, DateUtil.yyyy_MM_DD_CN);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                customer.setCreateTime(date);
             }
             //	企业类型
 //            td = selectBussiness.get(6).select("td").get(1).text();

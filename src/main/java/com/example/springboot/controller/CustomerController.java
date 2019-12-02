@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.example.springboot.entity.*;
 import com.example.springboot.service.impl.*;
+import com.example.springboot.utils.DateUtil;
 import com.example.springboot.utils.HttpClientTool;
 import com.example.springboot.utils.ResponseData;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.xml.ws.Response;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,8 +110,19 @@ public class CustomerController {
                     }
                 }
                 if (StringUtils.isNotBlank(elementTdFirst.text()) && StringUtils.contains(elementTdFirst.text(), "成立时间")) {
-                    if (StringUtils.isBlank(customer.getCreateTime())) {
-                        customer.setCreateTime(elementTds.get(1).text());
+                    if (customer.getCreateTime() == null) {
+                        Date date = null;
+                        try{
+                            if(StringUtils.contains(elementTds.get(1).text(),"-")){
+                                date = DateUtils.parseDate(elementTds.get(1).text(), DateUtil.yyyy_MM_dd_EN);
+                            }
+                            if(StringUtils.contains(elementTds.get(1).text(),"年")){
+                                date = DateUtils.parseDate(elementTds.get(1).text(), DateUtil.yyyy_MM_DD_CN);
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                        customer.setCreateTime(date);
                         busCount++;
                     }
                 }
@@ -676,20 +690,23 @@ public class CustomerController {
             queryWrapper.eq("SourceType",104009);
             queryWrapper.isNull("OrganizationCode");
         }
-        List<Customer> list = customerService.list(queryWrapper);
-        for(Customer customer:list){
-            try {
+//        List<Customer> list = customerService.list(queryWrapper);
+        while (true){
+            List<Customer> list =customerService.selectAllNotPool();
+            for(Customer customer:list){
+                try {
 
-                //从百度征信上获取
-                ResponseData<Customer> cUstomerInfoBaidu = dataFromBaiduService.getEntInfo(customer.getName());
-                if (cUstomerInfoBaidu.getCode() == ResponseData.SUCCESS_CODE) {
-                    Customer data = cUstomerInfoBaidu.getData();
+                    //从百度征信上获取
+                    ResponseData<Customer> cUstomerInfoBaidu = dataFromBaiduService.getEntInfo(customer.getName());
+                    if (cUstomerInfoBaidu.getCode() == ResponseData.SUCCESS_CODE) {
+                        Customer data = cUstomerInfoBaidu.getData();
 //                    data.setCustomeruserList(null);
-                    customerService.getCUstomerInfoToDb(data);
-                }
+                        customerService.getCUstomerInfoToDb(data);
+                    }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 //        this.startHandleBaiduAlibabaAddress("sss");

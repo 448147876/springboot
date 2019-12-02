@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -114,7 +115,7 @@ public class Customer implements Serializable {
 
     @ApiModelProperty(value = "成立时间")
     @TableField("CreateTime")
-    private String CreateTime;
+    private Date CreateTime;
 
     @ApiModelProperty(value = "数据来源：1、数据导入 2、网上抓取 3、人工录入")
     @TableField("SourceType")

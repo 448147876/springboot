@@ -8,9 +8,12 @@ import com.example.springboot.entity.CustomerImportQs;
 import com.example.springboot.entity.Customeruser;
 import com.example.springboot.mapper.CustomerMapper;
 import com.example.springboot.service.ICustomerService;
+import com.example.springboot.utils.DateUtil;
 import com.example.springboot.utils.ResponseData;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,8 +21,10 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -80,10 +85,22 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
             }
         }
         //获取成立时间
-        if (StringUtils.isBlank(customerOld.getCreateTime())) {
+        if (customerOld.getCreateTime() == null) {
             String registerDate = this.getDataByHtml(customerImportQsEach, 9);
             if (StringUtils.isNotBlank(registerDate)) {
-                customerOld.setCreateTime(registerDate);
+                try {
+                    Date date = null;
+                    if(StringUtils.contains(registerDate,"-")){
+                        date = DateUtils.parseDate(registerDate, DateUtil.yyyy_MM_dd_EN);
+                    }
+                    if(StringUtils.contains(registerDate,"年")){
+                        date = DateUtils.parseDate(registerDate, DateUtil.yyyy_MM_DD_CN);
+                    }
+                    customerOld.setCreateTime(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
         //获取主营产品
@@ -180,12 +197,23 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         Elements tds2 = element2.select("td");
         String createTime = tds2.get(3).html();
         if (StringUtils.equals(registeredCapitalStr, "-")) {
-            customer.setCreateTime("1970-01-01");
+            customer.setCreateTime(new Date());
         } else {
             createTime = StringUtils.replace(createTime, "年", "-");
             createTime = StringUtils.replace(createTime, "月", "-");
             createTime = StringUtils.replace(createTime, "日", "-");
-            customer.setCreateTime(createTime);
+            Date date = null;
+            try{
+                if(StringUtils.contains(createTime,"-")){
+                    date = DateUtils.parseDate(createTime, DateUtil.yyyy_MM_dd_EN);
+                }
+                if(StringUtils.contains(createTime,"年")){
+                    date = DateUtils.parseDate(createTime, DateUtil.yyyy_MM_DD_CN);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            customer.setCreateTime(date);
         }
         //统一社会信用代码
         Element element3 = elements.get(3);
@@ -279,7 +307,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         if (StringUtils.isBlank(customerOld.getWebSite()) && StringUtils.isNotBlank(customer.getWebSite())) {
             customerOld.setWebSite(customer.getWebSite());
         }
-        if (StringUtils.isBlank(customerOld.getCreateTime()) && StringUtils.isNotBlank(customer.getCreateTime())) {
+        if (customerOld.getCreateTime() == null && customer.getCreateTime() != null) {
             customerOld.setCreateTime(customer.getCreateTime());
         }
         if (StringUtils.isBlank(customerOld.getMainProducts()) && StringUtils.isNotBlank(customer.getMainProducts())) {
@@ -660,7 +688,18 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         element = elementsBusinessList.get(2);
         String text = element.select("td").get(3).text();
         if (StringUtils.isNotBlank(text)) {
-            customer.setCreateTime(text);
+            Date date = null;
+            try{
+                if(StringUtils.contains(text,"-")){
+                    date = DateUtils.parseDate(text, DateUtil.yyyy_MM_dd_EN);
+                }
+                if(StringUtils.contains(text,"年")){
+                    date = DateUtils.parseDate(text, DateUtil.yyyy_MM_DD_CN);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            customer.setCreateTime(date);
         }
         //统一征信代码
         element = elementsBusinessList.get(3);
@@ -755,7 +794,18 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
                 text1 = StringUtils.replace(select.get(1).text(), "年", "-");
                 text1 = StringUtils.replace(text1, "月", "-");
                 text1 = StringUtils.replace(text1, "日", "-");
-                customer.setCreateTime(text1);
+                Date date = null;
+                try{
+                    if(StringUtils.contains(text1,"-")){
+                        date = DateUtils.parseDate(text1, DateUtil.yyyy_MM_dd_EN);
+                    }
+                    if(StringUtils.contains(text1,"年")){
+                        date = DateUtils.parseDate(text1, DateUtil.yyyy_MM_DD_CN);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                customer.setCreateTime(date);
             }
             if (StringUtils.contains(text1, "注册资本") && StringUtils.isNotBlank(select.get(1).text())) {
                 text1 = select.get(1).text();
@@ -774,7 +824,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
                 }
             }
             if (StringUtils.contains(text1, "所属分类") && StringUtils.isNotBlank(select.get(1).text())) {
-                customer.setCreateTime(select.get(1).text());
+                customer.setBusinessIndustry(select.get(1).text());
             }
         }
 
@@ -846,7 +896,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         if(StringUtils.isBlank(customerOld.getCompanyDescript()) && StringUtils.isNotBlank(customer.getCompanyDescript())){
             customerOld.setCompanyDescript(customer.getCompanyDescript());
         }
-        if(StringUtils.isBlank(customerOld.getCreateTime()) && StringUtils.isNotBlank(customer.getCreateTime())){
+        if(customerOld.getCreateTime() == null && customer.getCreateTime()!= null){
             customerOld.setCreateTime(customer.getCreateTime());
         }
         if(StringUtils.isBlank(customerOld.getMainProducts()) && StringUtils.isNotBlank(customer.getMainProducts())){
@@ -943,4 +993,8 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         return getBaseMapper().selectNotInPoolCustomer();
     }
 
+    @Override
+    public List<Customer> selectAllNotPool() {
+        return getBaseMapper().selectAllNotPool();
+    }
 }
