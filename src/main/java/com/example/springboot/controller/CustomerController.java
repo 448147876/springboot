@@ -7,6 +7,7 @@ import com.example.springboot.entity.*;
 import com.example.springboot.service.impl.*;
 import com.example.springboot.utils.DateUtil;
 import com.example.springboot.utils.HttpClientTool;
+import com.example.springboot.utils.MyStringUtil;
 import com.example.springboot.utils.ResponseData;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -112,14 +113,14 @@ public class CustomerController {
                 if (StringUtils.isNotBlank(elementTdFirst.text()) && StringUtils.contains(elementTdFirst.text(), "成立时间")) {
                     if (customer.getCreateTime() == null) {
                         Date date = null;
-                        try{
-                            if(StringUtils.contains(elementTds.get(1).text(),"-")){
+                        try {
+                            if (StringUtils.contains(elementTds.get(1).text(), "-")) {
                                 date = DateUtils.parseDate(elementTds.get(1).text(), DateUtil.yyyy_MM_dd_EN);
                             }
-                            if(StringUtils.contains(elementTds.get(1).text(),"年")){
+                            if (StringUtils.contains(elementTds.get(1).text(), "年")) {
                                 date = DateUtils.parseDate(elementTds.get(1).text(), DateUtil.yyyy_MM_DD_CN);
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                         customer.setCreateTime(date);
@@ -459,46 +460,11 @@ public class CustomerController {
 
     @GetMapping("customerDatasqw")
     public void customerDatasqw() {
-        int count = 0;
         while (true) {
             List<String> list = customerService.listOne("顺企网");
             //循环处理
             for (String name : list) {
-                List<Cookies> listCookie1 = cookiesService.selectCookieOne("顺企网");
-                List<Cookies> listCookie2 = cookiesService.selectCookieOne("顺企网");
-                try {
-                    String urlList = "http://so.11467.com/cse/search?s=662286683871513660&ie=utf-8&q=" + URLEncoder.encode(StringUtils.trim(name));
-                    Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
-                    String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
-                    Document doc = Jsoup.parse(infoList);
-                    // 页面属性选择 通过key值取到select的内容
-                    Elements links = doc.select("#results>div>h3>a");
-                    // 选取第一个元素就是要访问的公司信息
-                    String href = null;
-                    for (Element element : links) {
-                        if (StringUtils.equals(element.select("em").html().trim(), name)) {
-                            href = element.attr("href");
-                            break;
-                        }
-                    }
-                    if (StringUtils.isBlank(href)) {
-                        continue;
-                    }
-                    String dataUrl = href;
-                    Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
-                    String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
-                    if (StringUtils.isNotBlank(dataInfo)) {
-                        DataCrawler dataCrawler = new DataCrawler();
-                        dataCrawler.setCreateTime(LocalDateTime.now());
-                        dataCrawler.setName(name);
-                        dataCrawler.setText(dataInfo);
-                        dataCrawler.setSource("顺企网");
-                        dataCrawlerService.save(dataCrawler);
-                        count++;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                this.customerDatasqwOne(name);
             }
         }
     }
@@ -509,7 +475,7 @@ public class CustomerController {
         List<Cookies> listCookie2 = cookiesService.selectCookieOne("顺企网");
         try {
             String urlList = "http://so.11467.com/cse/search?s=662286683871513660&ie=utf-8&q=" + URLEncoder.encode(StringUtils.trim(name));
-            Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
+            Thread.sleep(1000 * ((int) (3 + Math.random() * 2)));
             String infoList = HttpClientTool.doGet(urlList, listCookie1.get(0).getCookie());
             Document doc = Jsoup.parse(infoList);
             // 页面属性选择 通过key值取到select的内容
@@ -517,16 +483,28 @@ public class CustomerController {
             // 选取第一个元素就是要访问的公司信息
             String href = null;
             for (Element element : links) {
-                if (StringUtils.equals(element.select("em").html().trim(), name)) {
+                String em = element.select("em").html().trim();
+
+                em = StringUtils.remove(em,"(");
+                em = StringUtils.remove(em,")");
+                em = StringUtils.remove(em,"（");
+                em = StringUtils.remove(em,"）");
+                em = MyStringUtil.replaceAllChar(em);
+                String nameNew =StringUtils.remove(name,"(");
+                nameNew =StringUtils.remove(nameNew,")");
+                nameNew =StringUtils.remove(nameNew,"（");
+                nameNew =StringUtils.remove(nameNew,"）");
+                nameNew = MyStringUtil.replaceAllChar(nameNew);
+                if (StringUtils.equals(em, nameNew) || StringUtils.contains(nameNew,em) || StringUtils.contains(em,nameNew)) {
                     href = element.attr("href");
                     break;
                 }
             }
             if (StringUtils.isBlank(href)) {
-                return ResponseData.ERROR();
+                return ResponseData.ERRORMSG("没有查询到");
             }
             String dataUrl = href;
-            Thread.sleep(1000 * ((int) (25 + Math.random() * 10)));
+            Thread.sleep(1000 * ((int) (7 + Math.random() * 8)));
             String dataInfo = HttpClientTool.doGet(dataUrl, listCookie2.get(0).getCookie());
             if (StringUtils.isNotBlank(dataInfo)) {
                 DataCrawler dataCrawler = new DataCrawler();
@@ -539,16 +517,35 @@ public class CustomerController {
             return ResponseData.SUCCESS(dataInfo);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseData.ERRORMSG(e.getMessage());
         }
+        return ResponseData.ERRORMSG("没有查询到");
 
     }
 
     @GetMapping("customerDataSqwHandelOne")
     public ResponseData customerDataSqwHandelOne(String name) {
+        QueryWrapper<DataCrawler> dataCrawlerQueryWrapper = new QueryWrapper<>();
+        dataCrawlerQueryWrapper.eq("source", "顺企网");
+        dataCrawlerQueryWrapper.eq("name", name);
+        DataCrawler one = dataCrawlerService.getOne(dataCrawlerQueryWrapper);
+        String htmlStr = null;
+        if (one == null) {
+            ResponseData<String> responseData = this.customerDatasqwOne(name);
+            htmlStr = responseData.getData();
+        } else {
+            htmlStr = one.getText();
+        }
+        if (StringUtils.isBlank(htmlStr)) {
+            return ResponseData.ERRORMSG("企查查没有查询到该客户");
+        }
+
+        ResponseData<Customer> responseData = customerService.handleDataByQcc(htmlStr, name);
+        if (responseData.getCode() == ResponseData.ERROR_CODE) {
+            return responseData;
+        }
+        return customerService.saveInfoToDb(responseData.getData());
 
 
-        return null;
     }
 
 
@@ -659,7 +656,7 @@ public class CustomerController {
     public void startHandleAll() {
 
         List<Customer> customerList = customerService.selectNotInPoolCustomer();
-        for(Customer customer:customerList){
+        for (Customer customer : customerList) {
             try {
                 //从企查查上获取
                 ResponseData<Customer> cUstomerInfoQcc = customerService.getCUstomerInfoQcc(customer.getName());
@@ -684,18 +681,17 @@ public class CustomerController {
     @GetMapping("startHandleBaiduAlibabaAll")
     public void startHandleBaiduAlibabaAll(String name) {
         QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
-        if(StringUtils.isNotBlank(name)){
-            queryWrapper.eq("name",name);
-        }else{
-            queryWrapper.eq("SourceType",104009);
+        if (StringUtils.isNotBlank(name)) {
+            queryWrapper.eq("name", name);
+        } else {
+            queryWrapper.eq("SourceType", 104009);
             queryWrapper.isNull("OrganizationCode");
         }
 //        List<Customer> list = customerService.list(queryWrapper);
-        while (true){
-            List<Customer> list =customerService.selectAllNotPool();
-            for(Customer customer:list){
-                try {
-
+        while (true) {
+            try {
+                List<Customer> list = customerService.selectAllNotPool();
+                for (Customer customer : list) {
                     //从百度征信上获取
                     ResponseData<Customer> cUstomerInfoBaidu = dataFromBaiduService.getEntInfo(customer.getName());
                     if (cUstomerInfoBaidu.getCode() == ResponseData.SUCCESS_CODE) {
@@ -703,24 +699,27 @@ public class CustomerController {
 //                    data.setCustomeruserList(null);
                         customerService.getCUstomerInfoToDb(data);
                     }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+
+
         }
 //        this.startHandleBaiduAlibabaAddress("sss");
 
     }
+
     @GetMapping("startHandleBaiduAlibabaAddress")
     public void startHandleBaiduAlibabaAddress(String name) {
 //        ResponseData<Customer> cUstomerInfoBaidu = dataFromAlibabaService.getLocation(name);
 //        System.out.printf(cUstomerInfoBaidu.toString());
         QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("SourceType",104009);
+        queryWrapper.eq("SourceType", 104009);
         queryWrapper.isNull("OrganizationCode");
         List<Customer> list = customerService.list(queryWrapper);
-        for(Customer customer:list){
+        for (Customer customer : list) {
             try {
 
                 ResponseData<Customer> cUstomerInfoBaidu = dataFromAlibabaService.getLocation(customer.getName());

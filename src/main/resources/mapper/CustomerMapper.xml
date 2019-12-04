@@ -91,8 +91,8 @@
         SELECT
         c.Name AS name
         FROM customer c
-        WHERE 1=1
-        AND (EXISTS(SELECT cyy.id FROM customerhw_year_yield cyy WHERE cyy.customer_id = c.id AND cyy.hw_code IS NOT null))
+        WHERE c.SourceType = 104010
+--         AND (EXISTS(SELECT cyy.id FROM customerhw_year_yield cyy WHERE cyy.customer_id = c.id AND cyy.hw_code IS NOT null))
         AND
         (
 

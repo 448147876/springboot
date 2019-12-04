@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.FuyangMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.springboot.entity.Fuyang">
+        <id column="id" property="id" />
+        <result column="area_name" property="areaName" />
+        <result column="name" property="name" />
+        <result column="hw_name" property="hwName" />
+        <result column="hw_type" property="hwType" />
+        <result column="hw_code" property="hwCode" />
+        <result column="yeild" property="yeild" />
+        <result column="handle_name" property="handleName" />
+        <result column="area_code" property="areaCode" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, area_name, name, hw_name, hw_type, hw_code, yeild, handle_name, area_code
+    </sql>
+
+</mapper>

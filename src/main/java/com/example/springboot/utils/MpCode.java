@@ -17,14 +17,14 @@ public class MpCode {
         String packageName = "com.example.springboot.model";
         boolean serviceNameStartWithI = true;//user -> UserService, 设置成true: user -> IUserService
         //需要的表名，多个表名传数组
-        generateByTables(serviceNameStartWithI, packageName, "cookies");
+        generateByTables(serviceNameStartWithI, packageName, "areainfo");
     }
 
 
     private void generateByTables(boolean serviceNameStartWithI, String packageName, String... tableNames) {
         String projectPath = System.getProperty("user.dir");
         GlobalConfig config = new GlobalConfig();
-        String dbUrl = "jdbc:mysql://rm-bp19266526199q43p9o.mysql.rds.aliyuncs.com:3306/hyd_put";
+        String dbUrl = "jdbc:mysql://rm-bp19266526199q43p9o.mysql.rds.aliyuncs.com:3306/hyd_test";
         DataSourceConfig dataSourceConfig = new DataSourceConfig();
         dataSourceConfig.setDbType(DbType.MYSQL)
                 .setUrl(dbUrl)
