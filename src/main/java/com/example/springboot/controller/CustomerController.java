@@ -485,17 +485,17 @@ public class CustomerController {
             for (Element element : links) {
                 String em = element.select("em").html().trim();
 
-                em = StringUtils.remove(em,"(");
-                em = StringUtils.remove(em,")");
-                em = StringUtils.remove(em,"（");
-                em = StringUtils.remove(em,"）");
+                em = StringUtils.remove(em, "(");
+                em = StringUtils.remove(em, ")");
+                em = StringUtils.remove(em, "（");
+                em = StringUtils.remove(em, "）");
                 em = MyStringUtil.replaceAllChar(em);
-                String nameNew =StringUtils.remove(name,"(");
-                nameNew =StringUtils.remove(nameNew,")");
-                nameNew =StringUtils.remove(nameNew,"（");
-                nameNew =StringUtils.remove(nameNew,"）");
+                String nameNew = StringUtils.remove(name, "(");
+                nameNew = StringUtils.remove(nameNew, ")");
+                nameNew = StringUtils.remove(nameNew, "（");
+                nameNew = StringUtils.remove(nameNew, "）");
                 nameNew = MyStringUtil.replaceAllChar(nameNew);
-                if (StringUtils.equals(em, nameNew) || StringUtils.contains(nameNew,em) || StringUtils.contains(em,nameNew)) {
+                if (StringUtils.equals(em, nameNew) || StringUtils.contains(nameNew, em) || StringUtils.contains(em, nameNew)) {
                     href = element.attr("href");
                     break;
                 }
@@ -520,6 +520,27 @@ public class CustomerController {
         }
         return ResponseData.ERRORMSG("没有查询到");
 
+    }
+
+
+    @GetMapping("customerDataSqwHandelAll")
+    public ResponseData customerDataSqwHandelAll(String name) {
+        QueryWrapper<Customer> queryWrapper = new QueryWrapper<>();
+        if (StringUtils.isNotBlank(name)) {
+            queryWrapper.eq("name", name);
+        } else {
+            queryWrapper.eq("SourceType", 104010);
+        }
+        List<Customer> list = customerService.list(queryWrapper);
+        if (list != null && !list.isEmpty()) {
+            for(Customer customer:list){
+                customerDataSqwHandelOne(customer.getName());
+            }
+
+        }
+
+
+        return null;
     }
 
     @GetMapping("customerDataSqwHandelOne")
@@ -703,7 +724,6 @@ public class CustomerController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
 
 
         }
