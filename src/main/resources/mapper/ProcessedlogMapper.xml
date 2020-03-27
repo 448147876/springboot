@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.ProcessedlogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.example.springboot.entity.Processedlog">
+        <id column="ID" property="id" />
+        <result column="CustomerID" property="CustomerID" />
+        <result column="ProcessorID" property="ProcessorID" />
+        <result column="LinkedNo" property="LinkedNo" />
+        <result column="PlanNo" property="PlanNo" />
+        <result column="ProductName" property="ProductName" />
+        <result column="HWCode" property="HWCode" />
+        <result column="PhysicalState" property="PhysicalState" />
+        <result column="JYFS" property="jyfs" />
+        <result column="Transfer" property="Transfer" />
+        <result column="Packaging" property="Packaging" />
+        <result column="Unit" property="Unit" />
+        <result column="LCID" property="lcid" />
+        <result column="Path" property="Path" />
+        <result column="ProductionDate" property="ProductionDate" />
+        <result column="RecievedDate" property="RecievedDate" />
+        <result column="AddTime" property="AddTime" />
+        <result column="UpdateTime" property="UpdateTime" />
+        <result column="CarNo" property="CarNo" />
+        <result column="ImportNo" property="ImportNo" />
+        <result column="SourceType" property="SourceType" />
+        <result column="HWType" property="HWType" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ID, CustomerID, ProcessorID, LinkedNo, PlanNo, ProductName, HWCode, PhysicalState, JYFS, Transfer, Packaging, Unit, LCID, Path, ProductionDate, RecievedDate, AddTime, UpdateTime, CarNo, ImportNo, SourceType, HWType
+    </sql>
+
+</mapper>

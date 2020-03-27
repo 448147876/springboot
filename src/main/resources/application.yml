@@ -6,26 +6,24 @@ server:
 
 
 spring:
-  rabbitmq:
-    host: 47.111.151.105
-    port: 5672
-    username: guest
-    password: guest
-  redis:
-    host: 47.111.151.105
-    port: 6379
-    lettuce:
-      pool:
-        max-active: 8
-        max-idle: 8
-        min-idle: 0
   datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://47.111.151.105:3306/hyd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT
-    username: root
-    password: root
-    #    driver-class-name: com.mysql.cj.jdbc.Driver
-    driver-class-name: com.mysql.jdbc.Driver
+    dynamic:
+      primary: master
+      datasource:
+        master:
+          url: jdbc:mysql://192.168.0.175:3307/gqwf_test_copy_tong
+          username: root
+          password: root
+          driver-class-name: com.mysql.jdbc.Driver
+        slave:
+          url: jdbc:mysql://192.168.0.210:3306/gqwf_dev
+          username: root
+          password: tongzhijie
+          driver-class-name: com.mysql.jdbc.Driver
+  main:
+    allow-bean-definition-overriding: true
+  jackson:
+    default-property-inclusion: non_empty
 
 #mybatis-plus:
 mybatis-plus:
@@ -41,5 +39,11 @@ pagehelper:
 
 swagger:
   enable=true:
+
+  #日志配置
+logging:
+  level:
+    root: info
+    com.example.springboot.mapper: debug
 
 
