@@ -19,13 +19,15 @@ spring:
         max-active: 8
         max-idle: 8
         min-idle: 0
-  datasource:
-    type: com.alibaba.druid.pool.DruidDataSource
-    url: jdbc:mysql://47.111.151.105:3306/hyd?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone = GMT
+  datasource: #数据源配置
+    url: jdbc:mysql://192.168.0.33:3306/gqwf_dev_perfect_tong
     username: root
-    password: root
-    #    driver-class-name: com.mysql.cj.jdbc.Driver
-    driver-class-name: com.mysql.jdbc.Driver
+    password: tongzhijie
+    driverClassName: com.mysql.jdbc.Driver
+  data:
+    elasticsearch:
+      cluster-nodes: 192.168.0.210:9300
+      cluster-name: docker-cluster
 
 #mybatis-plus:
 mybatis-plus:
